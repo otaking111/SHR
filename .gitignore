@@ -1,0 +1,12 @@
+# Large Game Binaries & ISOs
+*.iso
+*.ISO
+*.xbe
+*.rcf
+
+# Python cache & temporary files
+__pycache__/
+*.pyc
+
+# Local scratch logs
+*.log

@@ -1,0 +1,3268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Simpsons: Hit & Run - Save Editor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+/* The Simpsons: Hit & Run - Save Editor Stylesheet */
+
+:root {
+    --bg-dark: #12131a;
+    --bg-card: #1c1e29;
+    --bg-card-header: #252837;
+    --bg-input: #151620;
+    
+    --simpson-yellow: #FED439;
+    --simpson-yellow-hover: #ffdf60;
+    --donut-pink: #FF5E8E;
+    --donut-pink-hover: #ff7ba4;
+    --shar-blue: #0099FF;
+    --shar-blue-dark: #0070bb;
+    --success-green: #00C853;
+    --warning-orange: #FF9100;
+    --danger-red: #FF3D00;
+    
+    --text-primary: #FFFFFF;
+    --text-secondary: #B0B5C6;
+    --text-muted: #747A92;
+    --border-color: #2F3347;
+    --border-highlight: #FED439;
+    
+    --font-heading: 'Bangers', cursive, sans-serif;
+    --font-body: 'Nunito', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-full: 9999px;
+    
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.4);
+    --shadow-yellow: 0 4px 16px rgba(254, 212, 57, 0.25);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.5;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+    background: #363a50;
+    border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--simpson-yellow);
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Header */
+.app-header {
+    background: linear-gradient(135deg, #1b1d28 0%, #151620 100%);
+    border-bottom: 3px solid var(--simpson-yellow);
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo-group {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.donut-logo {
+    font-size: 40px;
+    animation: rotateDonut 12s linear infinite;
+    display: inline-block;
+    filter: drop-shadow(0 4px 8px rgba(255, 94, 142, 0.4));
+}
+
+@keyframes rotateDonut {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.brand-title {
+    font-family: var(--font-heading);
+    color: var(--simpson-yellow);
+    font-size: 32px;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 0px #000, 3px 3px 0px rgba(0,0,0,0.5);
+    line-height: 1;
+}
+
+.brand-subtitle {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: var(--donut-pink);
+    text-transform: uppercase;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.export-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Buttons */
+.btn {
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 14px;
+    padding: 10px 18px;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.15s ease-in-out;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-primary {
+    background-color: var(--shar-blue);
+    color: white;
+}
+.btn-primary:hover {
+    background-color: var(--shar-blue-dark);
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background-color: #2e3244;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+.btn-secondary:hover {
+    background-color: #3b4057;
+    color: white;
+}
+
+.btn-success {
+    background-color: var(--simpson-yellow);
+    color: #12131a;
+    font-weight: 900;
+}
+.btn-success:hover {
+    background-color: var(--simpson-yellow-hover);
+    box-shadow: var(--shadow-yellow);
+    transform: translateY(-1px);
+}
+
+.btn-warning {
+    background-color: var(--donut-pink);
+    color: white;
+}
+.btn-warning:hover {
+    background-color: var(--donut-pink-hover);
+    transform: translateY(-1px);
+}
+
+.btn-accent {
+    background-color: #ffd439;
+    color: #12131a;
+    font-weight: 800;
+}
+.btn-accent:hover {
+    background-color: #ffe066;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: var(--radius-sm);
+}
+
+.w-100 {
+    width: 100%;
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    top: 90px;
+    right: 24px;
+    background: #1e2230;
+    border-left: 4px solid var(--simpson-yellow);
+    color: white;
+    padding: 14px 20px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    font-weight: 700;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.toast.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px);
+}
+
+/* Cheats Bar */
+.cheats-bar {
+    background-color: #181a24;
+    border-bottom: 1px solid var(--border-color);
+    padding: 10px 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.cheats-label {
+    font-family: var(--font-heading);
+    font-size: 16px;
+    color: var(--simpson-yellow);
+    letter-spacing: 1px;
+}
+
+.cheats-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.cheat-btn {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: #252837;
+    color: white;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.cheat-btn:hover {
+    transform: translateY(-2px);
+    border-color: var(--simpson-yellow);
+    box-shadow: var(--shadow-sm);
+}
+
+.cheat-100 {
+    background: linear-gradient(135deg, #f39c12, #e74c3c);
+    border-color: #f1c40f;
+}
+.cheat-coins {
+    background: #27ae60;
+}
+.cheat-cars {
+    background: #2980b9;
+}
+.cheat-cards {
+    background: #8e44ad;
+}
+
+/* Main Layout */
+.main-layout {
+    display: flex;
+    flex: 1;
+    min-height: calc(100vh - 180px);
+}
+
+/* Sidebar */
+.sidebar {
+    width: 280px;
+    background-color: #171822;
+    border-right: 1px solid var(--border-color);
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.save-status-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: var(--text-muted);
+}
+.status-dot.active {
+    background-color: var(--success-green);
+    box-shadow: 0 0 10px var(--success-green);
+}
+
+.save-meta-mini {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+}
+
+.meta-row {
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-secondary);
+}
+.meta-row strong {
+    color: var(--simpson-yellow);
+    font-family: var(--font-mono);
+}
+
+/* Nav Tabs */
+.nav-tabs {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.nav-tab {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.15s ease;
+}
+
+.nav-tab:hover {
+    background-color: rgba(254, 212, 57, 0.08);
+    color: var(--simpson-yellow);
+}
+
+.nav-tab.active {
+    background-color: var(--simpson-yellow);
+    color: #12131a;
+    font-weight: 900;
+    box-shadow: var(--shadow-yellow);
+}
+
+.sidebar-dropzone {
+    margin-top: auto;
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 18px 12px;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.02);
+    transition: all 0.2s ease;
+}
+
+.sidebar-dropzone.dragover {
+    border-color: var(--simpson-yellow);
+    background-color: rgba(254, 212, 57, 0.1);
+}
+
+.drop-icon {
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+.drop-text {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+.drop-text code {
+    color: var(--simpson-yellow);
+    font-family: var(--font-mono);
+}
+
+/* Content Area */
+.content-area {
+    flex: 1;
+    padding: 24px 32px;
+    overflow-y: auto;
+    max-height: calc(100vh - 180px);
+}
+
+.tab-pane {
+    display: none;
+    animation: fadeIn 0.2s ease-in-out;
+}
+.tab-pane.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.pane-header {
+    margin-bottom: 24px;
+}
+.pane-header h2 {
+    font-family: var(--font-heading);
+    color: var(--simpson-yellow);
+    font-size: 28px;
+    letter-spacing: 1.5px;
+    text-shadow: 1px 1px 0px #000;
+}
+.pane-desc {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+/* Cards & Layout */
+.grid-2col {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: var(--bg-card-header);
+    padding: 14px 20px;
+    font-weight: 800;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 16px;
+}
+.form-group label {
+    display: block;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+.form-control {
+    width: 100%;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    transition: border-color 0.15s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--simpson-yellow);
+    box-shadow: 0 0 0 2px rgba(254, 212, 57, 0.2);
+}
+
+.form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.input-with-button {
+    display: flex;
+    gap: 8px;
+}
+
+.form-range {
+    width: 100%;
+    accent-color: var(--simpson-yellow);
+    cursor: pointer;
+}
+
+.meta-preview-box {
+    margin-top: 14px;
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+}
+.meta-title {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+.meta-preview-box code {
+    font-family: var(--font-mono);
+    color: var(--donut-pink);
+    font-size: 12px;
+}
+
+/* Progress Dash */
+.progress-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.progress-box {
+    background-color: var(--bg-input);
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+}
+.progress-label strong {
+    color: var(--simpson-yellow);
+}
+
+.progress-bar-bg {
+    height: 8px;
+    background-color: #272a3a;
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--donut-pink), var(--simpson-yellow));
+    border-radius: var(--radius-full);
+    transition: width 0.3s ease;
+}
+
+/* Level Pills */
+.level-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.lvl-pill {
+    padding: 8px 14px;
+    border-radius: var(--radius-full);
+    background: #252837;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-weight: 800;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.lvl-pill:hover {
+    color: var(--simpson-yellow);
+    border-color: var(--simpson-yellow);
+}
+
+.lvl-pill.active {
+    background-color: var(--simpson-yellow);
+    color: #12131a;
+    border-color: var(--simpson-yellow);
+}
+
+/* Level Detail UI */
+.level-banner {
+    background: linear-gradient(135deg, #25293d 0%, #1c1e2d 100%);
+    border: 1px solid var(--border-color);
+    border-left: 6px solid var(--simpson-yellow);
+    border-radius: var(--radius-lg);
+    padding: 18px 24px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.level-title {
+    font-family: var(--font-heading);
+    font-size: 24px;
+    color: var(--simpson-yellow);
+    letter-spacing: 1px;
+}
+
+.level-meta-tags {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.tag {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: var(--radius-full);
+    background-color: rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+/* Missions Grid */
+.mission-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mission-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 12px 18px;
+    transition: all 0.15s ease;
+}
+
+.mission-item:hover {
+    border-color: #434863;
+}
+
+.mission-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.mission-checkbox {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--success-green);
+    cursor: pointer;
+}
+
+.mission-name {
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.mission-giver {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.mission-badge {
+    font-size: 11px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    text-transform: uppercase;
+}
+.badge-story { background: rgba(0, 153, 255, 0.15); color: var(--shar-blue); }
+.badge-race { background: rgba(255, 145, 0, 0.15); color: var(--warning-orange); }
+.badge-bonus { background: rgba(255, 94, 142, 0.15); color: var(--donut-pink); }
+.badge-gamble { background: rgba(0, 200, 83, 0.15); color: var(--success-green); }
+
+/* Cards Grid */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+    margin-top: 14px;
+}
+
+.card-item {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.card-item:hover {
+    border-color: var(--simpson-yellow);
+    transform: translateY(-1px);
+}
+
+.card-item.collected {
+    border-color: var(--simpson-yellow);
+    background: linear-gradient(135deg, rgba(254, 212, 57, 0.08) 0%, var(--bg-card) 100%);
+}
+
+.card-check {
+    margin-top: 2px;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--simpson-yellow);
+}
+
+.card-item-title {
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.card-item-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+/* Garage Grid */
+.filter-bar {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.filter-label {
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-right: 6px;
+}
+
+.filter-btn {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-color);
+    background: #202230;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.filter-btn:hover {
+    color: white;
+    border-color: #4b4f69;
+}
+
+.filter-btn.active {
+    background-color: var(--shar-blue);
+    border-color: var(--shar-blue);
+    color: white;
+}
+
+.garage-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.vehicle-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.15s ease;
+}
+
+.vehicle-card.owned {
+    border-color: rgba(254, 212, 57, 0.4);
+}
+
+.vehicle-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.vehicle-name {
+    font-weight: 900;
+    font-size: 16px;
+    color: var(--text-primary);
+}
+
+.vehicle-owned-tag {
+    font-size: 10px;
+    font-weight: 900;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    text-transform: uppercase;
+}
+.owned-yes { background: rgba(0, 200, 83, 0.2); color: var(--success-green); }
+.owned-no { background: rgba(255, 255, 255, 0.08); color: var(--text-muted); }
+
+.vehicle-type {
+    font-size: 12px;
+    color: var(--donut-pink);
+    font-weight: 700;
+}
+
+.car-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background-color: var(--bg-input);
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+}
+
+.stat-row {
+    display: flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.stat-name {
+    width: 75px;
+}
+
+.stat-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: #272a3a;
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin: 0 8px;
+}
+
+.stat-bar-fill {
+    height: 100%;
+    background: var(--simpson-yellow);
+    border-radius: var(--radius-full);
+}
+
+.vehicle-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+}
+
+/* Hex Viewer */
+.hex-viewer-container {
+    display: flex;
+    gap: 20px;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    min-height: 500px;
+}
+
+.hex-sidebar {
+    width: 240px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.hex-nav-title {
+    font-weight: 800;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.hex-jump-btn {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    background: #202331;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.hex-jump-btn:hover {
+    color: var(--simpson-yellow);
+    border-color: var(--simpson-yellow);
+}
+
+.hex-jump-btn.active {
+    background-color: var(--simpson-yellow);
+    color: #12131a;
+    font-weight: 700;
+}
+
+.hex-code-view {
+    flex: 1;
+    background-color: #0d0e14;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    overflow-y: auto;
+    max-height: 520px;
+}
+
+#hex-dump-content {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+    color: #a9b7c6;
+    white-space: pre;
+}
+
+/* Info list */
+.info-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.info-list li {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+.info-list strong {
+    color: var(--text-primary);
+}
+.info-list code {
+    color: var(--donut-pink);
+    font-family: var(--font-mono);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Footer */
+.app-footer {
+    background-color: #14151e;
+    border-top: 1px solid var(--border-color);
+    padding: 16px 28px;
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.footer-hint {
+    color: var(--simpson-yellow);
+    font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .main-layout {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .hex-viewer-container {
+        flex-direction: column;
+    }
+    .hex-sidebar {
+        width: 100%;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Navbar & Banner -->
+        <header class="app-header">
+            <div class="logo-group">
+                <div class="donut-logo">🍩</div>
+                <div>
+                    <h1 class="brand-title">SIMPSONS HIT & RUN</h1>
+                    <div class="brand-subtitle">WEB SAVE EDITOR • ORIGINAL XBOX & PC</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" id="btn-load-sample">
+                    <span class="btn-icon">⚡</span> Load Sample Save
+                </button>
+                <label class="btn btn-primary file-input-label">
+                    <span class="btn-icon">📂</span> Open Save File
+                    <input type="file" id="file-input" accept="*/*" style="display: none;">
+                </label>
+                <div class="export-dropdown">
+                    <button class="btn btn-success" id="btn-export-save">
+                        <span class="btn-icon">💾</span> Download Save (05)
+                    </button>
+                    <button class="btn btn-warning" id="btn-export-xbox-zip" title="Download entire Xbox Save Directory structure in a ZIP">
+                        <span class="btn-icon">📦</span> Xbox ZIP Bundle
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Notification Toast -->
+        <div id="toast" class="toast hidden"></div>
+
+        <!-- Quick Cheats Toolbar -->
+        <section class="cheats-bar">
+            <div class="cheats-label">⚡ QUICK CHEATS:</div>
+            <div class="cheats-buttons">
+                <button class="cheat-btn cheat-100" id="cheat-100">🌟 100% Game Completion</button>
+                <button class="cheat-btn cheat-coins" id="cheat-max-coins">💰 Max Coins (999,999)</button>
+                <button class="cheat-btn cheat-cars" id="cheat-all-cars">🚗 Unlock All 60 Vehicles</button>
+                <button class="cheat-btn cheat-cards" id="cheat-all-cards">🃏 Unlock 49 Cards</button>
+                <button class="cheat-btn cheat-missions" id="cheat-all-missions">🎯 Complete All Missions</button>
+                <button class="cheat-btn cheat-repair" id="cheat-repair-all">🔧 Repair All Vehicles</button>
+            </div>
+        </section>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Navigation Sidebar -->
+            <aside class="sidebar">
+                <!-- Save Status Card -->
+                <div class="save-status-card">
+                    <div class="status-indicator">
+                        <span class="status-dot active"></span>
+                        <span id="save-status-text">Sample Save Loaded</span>
+                    </div>
+                    <div class="save-meta-mini">
+                        <div class="meta-row"><span>Profile:</span> <strong id="lbl-profile">Player1</strong></div>
+                        <div class="meta-row"><span>Current:</span> <strong id="lbl-current-progress">L1 M1</strong></div>
+                        <div class="meta-row"><span>Coins:</span> <strong id="lbl-coins-stat">73</strong></div>
+                        <div class="meta-row"><span>Cards:</span> <strong id="lbl-cards-stat">1 / 49</strong></div>
+                        <div class="meta-row"><span>Vehicles:</span> <strong id="lbl-cars-stat">1 / 60</strong></div>
+                    </div>
+                </div>
+
+                <!-- Tab Menu -->
+                <nav class="nav-tabs">
+                    <button class="nav-tab active" data-tab="tab-overview">
+                        <span class="tab-icon">🏠</span> Overview & Profile
+                    </button>
+                    <button class="nav-tab" data-tab="tab-levels">
+                        <span class="tab-icon">🗺️</span> Levels & Missions (1-7)
+                    </button>
+                    <button class="nav-tab" data-tab="tab-cards">
+                        <span class="tab-icon">🃏</span> Collector Cards (49)
+                    </button>
+                    <button class="nav-tab" data-tab="tab-garage">
+                        <span class="tab-icon">🚗</span> Vehicle Garage (60)
+                    </button>
+                    <button class="nav-tab" data-tab="tab-settings">
+                        <span class="tab-icon">🔊</span> Audio & Options
+                    </button>
+                    <button class="nav-tab" data-tab="tab-hex">
+                        <span class="tab-icon">🔍</span> Hex & Inspector
+                    </button>
+                </nav>
+
+                <!-- Dropzone Box -->
+                <div class="sidebar-dropzone" id="dropzone">
+                    <div class="drop-icon">📥</div>
+                    <div class="drop-text">Drag & Drop save file here (e.g. <code>05</code> or <code>.rad</code>)</div>
+                </div>
+            </aside>
+
+            <!-- Content Area -->
+            <main class="content-area">
+                <!-- TAB 1: OVERVIEW & PROFILE -->
+                <div class="tab-pane active" id="tab-overview">
+                    <div class="pane-header">
+                        <h2>General Save Information & Profile</h2>
+                        <p class="pane-desc">Edit primary player profile, coin balance, current checkpoint, and completion timestamps.</p>
+                    </div>
+
+                    <div class="grid-2col">
+                        <!-- Profile Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-icon">👤</span> Player Profile & Wallet
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="input-profile-name">Profile Name (Max 15 chars)</label>
+                                    <input type="text" id="input-profile-name" maxlength="15" class="form-control" value="Player1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="input-coins">Coin Balance ($)</label>
+                                    <div class="input-with-button">
+                                        <input type="number" id="input-coins" min="0" max="999999" class="form-control" value="73">
+                                        <button class="btn btn-sm btn-accent" id="btn-quick-max-coins">Max ($999,999)</button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="select-current-level">Current Story Level</label>
+                                    <select id="select-current-level" class="form-control">
+                                        <option value="1">Level 1 - Homer (Suburbs)</option>
+                                        <option value="2">Level 2 - Bart (Downtown)</option>
+                                        <option value="3">Level 3 - Lisa (Squidport)</option>
+                                        <option value="4">Level 4 - Marge (Suburbs Night)</option>
+                                        <option value="5">Level 5 - Apu (Downtown Night)</option>
+                                        <option value="6">Level 6 - Bart (Squidport Night)</option>
+                                        <option value="7">Level 7 - Homer (Suburbs Spooky)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="select-current-mission">Current Active Mission</label>
+                                    <select id="select-current-mission" class="form-control">
+                                        <option value="0">Tutorial / Staging (m0)</option>
+                                        <option value="1">Mission 1 (m1)</option>
+                                        <option value="2">Mission 2 (m2)</option>
+                                        <option value="3">Mission 3 (m3)</option>
+                                        <option value="4">Mission 4 (m4)</option>
+                                        <option value="5">Mission 5 (m5)</option>
+                                        <option value="6">Mission 6 (m6)</option>
+                                        <option value="7">Mission 7 (m7)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Timestamp Card -->
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-icon">🕒</span> Save Timestamp & Metadata
+                            </div>
+                            <div class="card-body">
+                                <div class="form-row-2">
+                                    <div class="form-group">
+                                        <label for="input-year">Year</label>
+                                        <input type="number" id="input-year" class="form-control" value="2026">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="input-month">Month (1-12)</label>
+                                        <input type="number" id="input-month" min="1" max="12" class="form-control" value="8">
+                                    </div>
+                                </div>
+                                <div class="form-row-2">
+                                    <div class="form-group">
+                                        <label for="input-day">Day (1-31)</label>
+                                        <input type="number" id="input-day" min="1" max="31" class="form-control" value="23">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="input-time">Time (HH:MM:SS)</label>
+                                        <input type="text" id="input-time" class="form-control" value="18:26:33">
+                                    </div>
+                                </div>
+                                <button class="btn btn-secondary w-100" id="btn-set-timestamp-now">
+                                    <span class="btn-icon">⏱️</span> Sync Timestamp to Current Time
+                                </button>
+                                
+                                <div class="meta-preview-box">
+                                    <div class="meta-title">Xbox SaveMeta.xbx Preview:</div>
+                                    <code id="meta-preview-text">Name = (L1 M1)    08/23/26 18:26:33</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Overall Completion Dashboard -->
+                    <div class="card mt-20">
+                        <div class="card-header">
+                            <span class="card-icon">📊</span> Total Game Completion Stats
+                        </div>
+                        <div class="card-body">
+                            <div class="progress-grid">
+                                <div class="progress-box">
+                                    <div class="progress-label"><span>Story Missions</span> <strong id="prog-missions-text">1 / 91</strong></div>
+                                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-missions-bar" style="width: 2%;"></div></div>
+                                </div>
+                                <div class="progress-box">
+                                    <div class="progress-label"><span>Collector Cards</span> <strong id="prog-cards-text">1 / 49</strong></div>
+                                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-cards-bar" style="width: 2%;"></div></div>
+                                </div>
+                                <div class="progress-box">
+                                    <div class="progress-label"><span>Garage Vehicles</span> <strong id="prog-cars-text">1 / 60</strong></div>
+                                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-cars-bar" style="width: 2%;"></div></div>
+                                </div>
+                                <div class="progress-box">
+                                    <div class="progress-label"><span>Wasps Destroyed</span> <strong id="prog-wasps-text">0 / 140</strong></div>
+                                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="prog-wasps-bar" style="width: 0%;"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: LEVELS & MISSIONS -->
+                <div class="tab-pane" id="tab-levels">
+                    <div class="pane-header flex-between">
+                        <div>
+                            <h2>Level Progression & Missions</h2>
+                            <p class="pane-desc">Configure individual story missions, street races, bonus missions, gags, and character costumes for each level.</p>
+                        </div>
+                        <div class="level-pills" id="level-selector-pills">
+                            <!-- Level Buttons 1 to 7 -->
+                        </div>
+                    </div>
+
+                    <!-- Level Details Container -->
+                    <div id="level-detail-container">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- TAB 3: COLLECTOR CARDS -->
+                <div class="tab-pane" id="tab-cards">
+                    <div class="pane-header flex-between">
+                        <div>
+                            <h2>Collector Cards & Itchy & Scratchy Movie Rewards</h2>
+                            <p class="pane-desc">49 Collector Cards across all 7 levels. Collecting all 7 cards in a level unlocks a special bonus vehicle!</p>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-sm btn-accent" id="btn-collect-all-cards">✨ Collect All 49 Cards</button>
+                        </div>
+                    </div>
+
+                    <div id="all-cards-container">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- TAB 4: VEHICLE GARAGE -->
+                <div class="tab-pane" id="tab-garage">
+                    <div class="pane-header flex-between">
+                        <div>
+                            <h2>Vehicle Garage (60 Slots)</h2>
+                            <p class="pane-desc">Manage purchased, reward, and secret vehicles in your phone booth garage. Set health and indestructible status.</p>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-sm btn-success" id="btn-garage-unlock-all">🚗 Unlock All Vehicles</button>
+                            <button class="btn btn-sm btn-warning" id="btn-garage-repair-all">🔧 100% Health All</button>
+                        </div>
+                    </div>
+
+                    <!-- Garage Category Filter -->
+                    <div class="filter-bar">
+                        <span class="filter-label">Filter:</span>
+                        <button class="filter-btn active" data-filter="all">All Vehicles</button>
+                        <button class="filter-btn" data-filter="owned">Owned Only</button>
+                        <button class="filter-btn" data-filter="level1">Level 1</button>
+                        <button class="filter-btn" data-filter="level2">Level 2</button>
+                        <button class="filter-btn" data-filter="level3">Level 3</button>
+                        <button class="filter-btn" data-filter="level4">Level 4</button>
+                        <button class="filter-btn" data-filter="level5">Level 5</button>
+                        <button class="filter-btn" data-filter="level6">Level 6</button>
+                        <button class="filter-btn" data-filter="level7">Level 7</button>
+                        <button class="filter-btn" data-filter="bonus">Secret / Cheat</button>
+                    </div>
+
+                    <div class="garage-grid" id="garage-grid">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- TAB 5: AUDIO & SETTINGS -->
+                <div class="tab-pane" id="tab-settings">
+                    <div class="pane-header">
+                        <h2>Audio & Game Settings</h2>
+                        <p class="pane-desc">Adjust in-game sound volumes and gameplay options saved in binary memory.</p>
+                    </div>
+
+                    <div class="grid-2col">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-icon">🔊</span> Volume Controls
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="range-sfx">Sound FX Volume: <span id="val-sfx">84%</span></label>
+                                    <input type="range" id="range-sfx" min="0" max="1" step="0.01" class="form-range" value="0.84">
+                                </div>
+                                <div class="form-group">
+                                    <label for="range-music">Music Volume: <span id="val-music">88%</span></label>
+                                    <input type="range" id="range-music" min="0" max="1" step="0.01" class="form-range" value="0.88">
+                                </div>
+                                <div class="form-group">
+                                    <label for="range-dialog">Dialogue Volume: <span id="val-dialog">88%</span></label>
+                                    <input type="range" id="range-dialog" min="0" max="1" step="0.01" class="form-range" value="0.88">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-icon">🎮</span> Save File Format Specs
+                            </div>
+                            <div class="card-body">
+                                <ul class="info-list">
+                                    <li><strong>Save Slot:</strong> Xbox Title ID <code>56550015</code> (The Simpsons: Hit & Run)</li>
+                                    <li><strong>File Size:</strong> 7,218 Bytes (Xbox Memory Payload + Signature)</li>
+                                    <li><strong>Level Size:</strong> 620 Bytes per Level (7 Levels Total = 4,340 Bytes)</li>
+                                    <li><strong>Vehicles Table:</strong> 60 Slots (1,440 Bytes)</li>
+                                    <li><strong>Compatibility:</strong> Original Xbox, Xemu, Cxbx-Reloaded, PC saves</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 6: HEX & INSPECTOR -->
+                <div class="tab-pane" id="tab-hex">
+                    <div class="pane-header">
+                        <h2>Binary Memory Inspector & Live Hex View</h2>
+                        <p class="pane-desc">Inspect exact memory offsets, structure sizes, and raw hex bytes of the save file.</p>
+                    </div>
+
+                    <div class="hex-viewer-container">
+                        <div class="hex-sidebar">
+                            <div class="hex-nav-title">Memory Regions</div>
+                            <button class="hex-jump-btn active" data-offset="0">0x0000: Header & Profile</button>
+                            <button class="hex-jump-btn" data-offset="37">0x0025: Level 1 Block (620B)</button>
+                            <button class="hex-jump-btn" data-offset="657">0x0291: Level 2 Block (620B)</button>
+                            <button class="hex-jump-btn" data-offset="1277">0x04FD: Level 3 Block (620B)</button>
+                            <button class="hex-jump-btn" data-offset="1897">0x0769: Level 4 Block (620B)</button>
+                            <button class="hex-jump-btn" data-offset="2517">0x09D5: Level 5 Block (620B)</button>
+                            <button class="hex-jump-btn" data-offset="3137">0x0C41: Level 6 Block (620B)</button>
+                            <button class="hex-jump-btn" data-offset="3757">0x0EAD: Level 7 Block (620B)</button>
+                            <button class="hex-jump-btn" data-offset="4377">0x1119: Global State & Coins</button>
+                            <button class="hex-jump-btn" data-offset="4401">0x1131: 60 Vehicles Table</button>
+                            <button class="hex-jump-btn" data-offset="5841">0x16D1: World Bitmasks</button>
+                            <button class="hex-jump-btn" data-offset="7157">0x1BF5: Audio & Options</button>
+                            <button class="hex-jump-btn" data-offset="7194">0x1C1A: Xbox Signature</button>
+                        </div>
+                        <div class="hex-code-view">
+                            <pre id="hex-dump-content">Loading binary dump...</pre>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div>The Simpsons: Hit & Run Save Editor • Self-Contained Offline HTML Web App</div>
+            <div class="footer-hint">Save files are modified in real-time in your browser without uploading to any external server.</div>
+        </footer>
+    </div>
+
+    <!-- Self-Contained Inlined Scripts -->
+    <script>
+
+// Lightweight Pure Vanilla JS ZIP Builder (Store mode, zero dependencies)
+class SimpleZip {
+    constructor() {
+        this.files = [];
+    }
+    file(path, data) {
+        let uint8;
+        if (typeof data === 'string') {
+            uint8 = new TextEncoder().encode(data);
+        } else if (data instanceof Uint8Array) {
+            uint8 = data;
+        } else if (data instanceof ArrayBuffer) {
+            uint8 = new Uint8Array(data);
+        } else {
+            uint8 = new Uint8Array(0);
+        }
+        this.files.push({ path, data: uint8 });
+    }
+    folder(dirPath) {
+        const self = this;
+        return {
+            file: (name, data) => self.file(dirPath.replace(/\/$/, '') + '/' + name.replace(/^\//, ''), data),
+            folder: (sub) => self.folder(dirPath.replace(/\/$/, '') + '/' + sub.replace(/^\//, ''))
+        };
+    }
+    crc32(buf) {
+        let table = SimpleZip.crcTable;
+        if (!table) {
+            table = SimpleZip.crcTable = new Uint32Array(256);
+            for (let i = 0; i < 256; i++) {
+                let c = i;
+                for (let k = 0; k < 8; k++) {
+                    c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+                }
+                table[i] = c >>> 0;
+            }
+        }
+        let crc = 0 ^ (-1);
+        for (let i = 0; i < buf.length; i++) {
+            crc = (crc >>> 8) ^ table[(crc ^ buf[i]) & 0xFF];
+        }
+        return (crc ^ (-1)) >>> 0;
+    }
+    async generateAsync() {
+        let localHeaders = [];
+        let centralHeaders = [];
+        let offset = 0;
+
+        for (const file of this.files) {
+            const nameBytes = new TextEncoder().encode(file.path);
+            const crc = this.crc32(file.data);
+            const size = file.data.length;
+
+            // Local File Header
+            const lfh = new Uint8Array(30 + nameBytes.length);
+            const lfhView = new DataView(lfh.buffer);
+            lfhView.setUint32(0, 0x04034b50, true); // signature
+            lfhView.setUint16(4, 10, true); // version needed
+            lfhView.setUint16(6, 0, true); // flags
+            lfhView.setUint16(8, 0, true); // compression: store
+            lfhView.setUint16(10, 0, true); // mod time
+            lfhView.setUint16(12, 0, true); // mod date
+            lfhView.setUint32(14, crc, true); // crc32
+            lfhView.setUint32(18, size, true); // compressed size
+            lfhView.setUint32(22, size, true); // uncompressed size
+            lfhView.setUint16(26, nameBytes.length, true);
+            lfhView.setUint16(28, 0, true); // extra length
+            lfh.set(nameBytes, 30);
+
+            localHeaders.push({ lfh, data: file.data });
+
+            // Central Directory Header
+            const cdh = new Uint8Array(46 + nameBytes.length);
+            const cdhView = new DataView(cdh.buffer);
+            cdhView.setUint32(0, 0x02014b50, true); // signature
+            cdhView.setUint16(4, 20, true); // version made by
+            cdhView.setUint16(6, 10, true); // version needed
+            cdhView.setUint16(8, 0, true); // flags
+            cdhView.setUint16(10, 0, true); // compression
+            cdhView.setUint16(12, 0, true); // mod time
+            cdhView.setUint16(14, 0, true); // mod date
+            cdhView.setUint32(16, crc, true); // crc32
+            cdhView.setUint32(20, size, true); // comp size
+            cdhView.setUint32(24, size, true); // uncomp size
+            cdhView.setUint16(28, nameBytes.length, true);
+            cdhView.setUint16(30, 0, true); // extra length
+            cdhView.setUint16(32, 0, true); // comment length
+            cdhView.setUint16(34, 0, true); // disk num start
+            cdhView.setUint16(36, 0, true); // int attrs
+            cdhView.setUint32(38, 0, true); // ext attrs
+            cdhView.setUint32(42, offset, true); // local header offset
+            cdh.set(nameBytes, 46);
+
+            centralHeaders.push(cdh);
+            offset += lfh.length + size;
+        }
+
+        const cdOffset = offset;
+        let cdSize = 0;
+        for (const cdh of centralHeaders) cdSize += cdh.length;
+
+        // End of Central Directory
+        const eocd = new Uint8Array(22);
+        const eocdView = new DataView(eocd.buffer);
+        eocdView.setUint32(0, 0x06054b50, true);
+        eocdView.setUint16(4, 0, true); // disk num
+        eocdView.setUint16(6, 0, true); // start disk
+        eocdView.setUint16(8, this.files.length, true); // entries on disk
+        eocdView.setUint16(10, this.files.length, true); // total entries
+        eocdView.setUint32(12, cdSize, true); // size of CD
+        eocdView.setUint32(16, cdOffset, true); // offset of CD
+        eocdView.setUint16(20, 0, true); // comment length
+
+        // Combine all chunks into one Uint8Array
+        const totalSize = cdOffset + cdSize + 22;
+        const result = new Uint8Array(totalSize);
+        let cur = 0;
+        for (const item of localHeaders) {
+            result.set(item.lfh, cur); cur += item.lfh.length;
+            result.set(item.data, cur); cur += item.data.length;
+        }
+        for (const cdh of centralHeaders) {
+            result.set(cdh, cur); cur += cdh.length;
+        }
+        result.set(eocd, cur);
+
+        return new Blob([result], { type: 'application/zip' });
+    }
+}
+window.JSZip = SimpleZip;
+
+    </script>
+    <script>
+// The Simpsons: Hit & Run - Comprehensive Game Data Definition
+// Extracted from Radical Entertainment scripts (rewards.mfk, level.mfk, missions.mfk, cars.con)
+
+const SHAR_DATA = {
+    levels: [
+        {
+            id: 1,
+            name: "Level 1: Evergreen Terrace / Suburbs",
+            character: "Homer",
+            timeOfDay: "Day",
+            zone: "Residential / Nuclear Plant",
+            totalGags: 15,
+            totalWasps: 20,
+            missions: [
+                { id: "m0", name: "Tutorial: The Cola Caper", giver: "Marge", type: "tutorial" },
+                { id: "m1", name: "Mission 1: S-M-R-T", giver: "Homer", type: "story" },
+                { id: "m2", name: "Mission 2: Petty Theft", giver: "Barney", type: "story" },
+                { id: "m3", name: "Mission 3: Office Spaced", giver: "Mr. Burns", type: "story" },
+                { id: "m4", name: "Mission 4: Blind Big Brother", giver: "Lenny", type: "story" },
+                { id: "m5", name: "Mission 5: Flowers By Irene", giver: "Carl", type: "story" },
+                { id: "m6", name: "Mission 6: Bonfire of the Manatees", giver: "Apu", type: "story" },
+                { id: "m7", name: "Mission 7: The Fat and the Furious", giver: "Lisa", type: "story" },
+                { id: "sr1", name: "Street Race 1: Time Trial", giver: "Ralph", type: "race" },
+                { id: "sr2", name: "Street Race 2: Circuit Race", giver: "Nelson", type: "race" },
+                { id: "sr3", name: "Street Race 3: Checkpoint Race", giver: "Milhouse", type: "race" },
+                { id: "bm1", name: "Bonus Mission: This Old Shanty", giver: "Cletus", type: "bonus", reward: "cletu_v (Pickup Truck)" },
+                { id: "gr1", name: "Gamble Race: Evergreen Sprint", giver: "Louie", type: "gamble" }
+            ],
+            cards: [
+                { num: 1, name: "Bar None Candy Bar", desc: "Chocolate bar with the taste of chocolate and nuts!" },
+                { num: 2, name: "Soy Pop", desc: "It has the delicious flavor of soy beans!" },
+                { num: 3, name: "Mr. Sparkle Box", desc: "I am disrespectful to dirt! Can you see that I am serious?" },
+                { num: 4, name: "Pork Parchments", desc: "Made with authentic pork by-products." },
+                { num: 5, name: "Bort License Plate", desc: "We need more Bort license plates in the gift shop." },
+                { num: 6, name: "Donut Box", desc: "Mmm... forbidden donut." },
+                { num: 7, name: "Tab Soda", desc: "No time for that now, the computer's starting!" }
+            ],
+            bonusCar: { id: "rocke_v", name: "Rocket Car" },
+            skins: [
+                { id: "homer", name: "Default Homer", cost: 0, type: "default" },
+                { id: "h_undrwr", name: "Casual / Underwear Homer", cost: 100, type: "shop" },
+                { id: "h_fat", name: "Muumuu / Fat Homer", cost: 125, type: "shop" },
+                { id: "h_stcrobe", name: "Chosen One / Stonecutter Homer", cost: 150, type: "shop" }
+            ],
+            cars: [
+                { id: "famil_v", name: "Family Sedan", type: "default", cost: 0 },
+                { id: "cletu_v", name: "Pickup Truck", type: "bonus", cost: 0 },
+                { id: "elect_v", name: "Electaurus", type: "race", cost: 0 },
+                { id: "plowk_v", name: "Plow King", type: "shop", cost: 150, seller: "Barney" },
+                { id: "cDuff", name: "Duff Truck", type: "shop", cost: 125, seller: "Gil" },
+                { id: "cVan", name: "Surveillance Van", type: "shop", cost: 100, seller: "Gil" }
+            ]
+        },
+        {
+            id: 2,
+            name: "Level 2: Downtown Springfield",
+            character: "Bart",
+            timeOfDay: "Day",
+            zone: "Commercial / Downtown",
+            totalGags: 11,
+            totalWasps: 20,
+            missions: [
+                { id: "m0", name: "Tutorial / Staging", giver: "Bart", type: "tutorial" },
+                { id: "m1", name: "Mission 1: Detention Deficit Disorder", giver: "Principal Skinner", type: "story" },
+                { id: "m2", name: "Mission 2: Weapons of Mass Delinquency", giver: "Homer", type: "story" },
+                { id: "m3", name: "Mission 3: Vox Populi", giver: "Comic Book Guy", type: "story" },
+                { id: "m4", name: "Mission 4: Bart & Frink vs 3-D Monster", giver: "Professor Frink", type: "story" },
+                { id: "m5", name: "Mission 5: Better Than Beef", giver: "Apu", type: "story" },
+                { id: "m6", name: "Mission 6: Monkey See Monkey D'oh", giver: "Dr. Nick", type: "story" },
+                { id: "m7", name: "Mission 7: Cell-Outs", giver: "Snake", type: "story" },
+                { id: "sr1", name: "Street Race 1: Point to Point", giver: "Nelson", type: "race" },
+                { id: "sr2", name: "Street Race 2: Circuit Race", giver: "Milhouse", type: "race" },
+                { id: "sr3", name: "Street Race 3: Checkpoint Race", giver: "Ralph", type: "race" },
+                { id: "bm1", name: "Bonus Mission: Dial B for Blood", giver: "Grampa", type: "bonus", reward: "gramp_v (WWII Jeep)" },
+                { id: "gr1", name: "Gamble Race: Downtown Dash", giver: "Louie", type: "gamble" }
+            ],
+            cards: [
+                { num: 1, name: "Radioactive Man #1", desc: "Up and at them! The first ever issue." },
+                { num: 2, name: "Bonestorm", desc: "Buy me Bonestorm or go to hell!" },
+                { num: 3, name: "Bart Simpson Card", desc: "Don't have a cow, man!" },
+                { num: 4, name: "Itchy & Scratchy Cel", desc: "Original animation cel from The Itchy & Scratchy Show." },
+                { num: 5, name: "Glow-in-the-Dark Homer", desc: "Radiating nuclear awesomeness." },
+                { num: 6, name: "Disposal Bag", desc: "Official Springfield nuclear waste containment bag." },
+                { num: 7, name: "Love Tester Machine", desc: "You are: CASANOVA!" }
+            ],
+            bonusCar: { id: "mono_v", name: "Monorail Car" },
+            skins: [
+                { id: "bart", name: "Default Bart", cost: 0, type: "default" },
+                { id: "b_tall", name: "Tall Bart", cost: 150, type: "shop" },
+                { id: "b_football", name: "Football Bart", cost: 200, type: "shop" },
+                { id: "b_ninja", name: "Ninja Bart", cost: 250, type: "shop" }
+            ],
+            cars: [
+                { id: "honor_v", name: "Honor Roller", type: "default", cost: 0 },
+                { id: "gramp_v", name: "WWII Jeep", type: "bonus", cost: 0 },
+                { id: "moe_v", name: "Sedan (Moe's)", type: "race", cost: 0 },
+                { id: "mrplo_v", name: "Mr. Plow", type: "shop", cost: 200, seller: "Homer" },
+                { id: "cLimo", name: "Limousine", type: "shop", cost: 150, seller: "Gil" },
+                { id: "cFire_v", name: "Fire Truck", type: "shop", cost: 250, seller: "Gil" }
+            ]
+        },
+        {
+            id: 3,
+            name: "Level 3: Springfield Squidport & Harbour",
+            character: "Lisa",
+            timeOfDay: "Day",
+            zone: "Squidport / Pier / Dam",
+            totalGags: 11,
+            totalWasps: 20,
+            missions: [
+                { id: "m0", name: "Tutorial / Staging", giver: "Lisa", type: "tutorial" },
+                { id: "m1", name: "Mission 1: Nerd Race Queen", giver: "Comic Book Guy", type: "story" },
+                { id: "m2", name: "Mission 2: Clueless", giver: "Milhouse", type: "story" },
+                { id: "m3", name: "Mission 3: Bonfire of the Manatees", giver: "Apu", type: "story" },
+                { id: "m4", name: "Mission 4: Operation Hellfish", giver: "Grampa", type: "story" },
+                { id: "m5", name: "Mission 5: Slithery Sleuthing", giver: "Snake", type: "story" },
+                { id: "m6", name: "Mission 6: Fishy Deals", giver: "Captain McCallister", type: "story" },
+                { id: "m7", name: "Mission 7: The Old Pirate and the Sea", giver: "Captain", type: "story" },
+                { id: "sr1", name: "Street Race 1: Time Trial", giver: "Milhouse", type: "race" },
+                { id: "sr2", name: "Street Race 2: Circuit Race", giver: "Nelson", type: "race" },
+                { id: "sr3", name: "Street Race 3: Checkpoint Race", giver: "Ralph", type: "race" },
+                { id: "bm1", name: "Bonus Mission: Principal of the Thing", giver: "Skinner", type: "bonus", reward: "skinn_v (Sedan)" },
+                { id: "gr1", name: "Gamble Race: Pier Pressure", giver: "Louie", type: "gamble" }
+            ],
+            cards: [
+                { num: 1, name: "Eye On Springfield", desc: "Springfield's finest tabloid news program." },
+                { num: 2, name: "Lisa's Saxophone", desc: "For Lisa - Never Forget Your Saxophone - Love, Dad." },
+                { num: 3, name: "Bleeding Gums Murphy Album", desc: "Sax on the Beach album record." },
+                { num: 4, name: "Angel Skeleton", desc: "The Angel Skeleton hoax from the dig site." },
+                { num: 5, name: "Evil Krusty Doll", desc: "Set to: EVIL." },
+                { num: 6, name: "Soy Milk", desc: "For calcium-rich non-dairy refreshment." },
+                { num: 7, name: "Freezer Geezer", desc: "Frostillicus frozen in the Kwik-E-Mart freezer!" }
+            ],
+            bonusCar: { id: "bookb_v", name: "Book Burning Van" },
+            skins: [
+                { id: "lisa", name: "Default Lisa", cost: 0, type: "default" },
+                { id: "l_cool", name: "Cool Lisa", cost: 250, type: "shop" },
+                { id: "l_florida", name: "Floreda Lisa", cost: 250, type: "shop" },
+                { id: "l_jersey", name: "Hockey Lisa", cost: 300, type: "shop" }
+            ],
+            cars: [
+                { id: "lisa_v", name: "Malibu Stacy Car", type: "default", cost: 0 },
+                { id: "skinn_v", name: "Sedan (Skinner's)", type: "bonus", cost: 0 },
+                { id: "bookb_v", name: "Book Burning Van", type: "race", cost: 0 },
+                { id: "otto_v", name: "School Bus", type: "shop", cost: 300, seller: "Otto" },
+                { id: "cDonut", name: "Donut Truck", type: "shop", cost: 250, seller: "Gil" },
+                { id: "cNerd", name: "Nerd Car", type: "shop", cost: 250, seller: "Gil" }
+            ]
+        },
+        {
+            id: 4,
+            name: "Level 4: Evergreen Terrace (Night)",
+            character: "Marge",
+            timeOfDay: "Night",
+            zone: "Residential / Suburbs Night",
+            totalGags: 15,
+            totalWasps: 20,
+            missions: [
+                { id: "m0", name: "Tutorial / Staging", giver: "Marge", type: "tutorial" },
+                { id: "m1", name: "Mission 1: For a Few Donuts More", giver: "Chief Wiggum", type: "story" },
+                { id: "m2", name: "Mission 2: Redneck Roundup", giver: "Cletus", type: "story" },
+                { id: "m3", name: "Mission 3: Ketchup Logic", giver: "Comic Book Guy", type: "story" },
+                { id: "m4", name: "Mission 4: Return of the Nearly-Dead", giver: "Grampa", type: "story" },
+                { id: "m5", name: "Mission 5: Wolves Stole My Apu", giver: "Chief Wiggum", type: "story" },
+                { id: "m6", name: "Mission 6: The Cooler", giver: "Snake", type: "story" },
+                { id: "m7", name: "Mission 7: Beached Love", giver: "Bart", type: "story" },
+                { id: "sr1", name: "Street Race 1: Time Trial", giver: "Ralph", type: "race" },
+                { id: "sr2", name: "Street Race 2: Circuit Race", giver: "Nelson", type: "race" },
+                { id: "sr3", name: "Street Race 3: Checkpoint Race", giver: "Milhouse", type: "race" },
+                { id: "bm1", name: "Bonus Mission: Ketchup Kayak", giver: "Comic Book Guy", type: "bonus", reward: "comic_v ('70s Sports Car)" },
+                { id: "gr1", name: "Gamble Race: Suburbia Speedway", giver: "Louie", type: "gamble" }
+            ],
+            cards: [
+                { num: 1, name: "Boudoir Photo", desc: "Marge's glamour photo for Homer." },
+                { num: 2, name: "Pepper Spray", desc: "One squirt and you're blind as a bat!" },
+                { num: 3, name: "Krusty-O's", desc: "Flesh-eating bacteria in every box!" },
+                { num: 4, name: "Canyonero", desc: "Top of the line in utility sports!" },
+                { num: 5, name: "Power Plant Uniform", desc: "Standard issue hazmat suit." },
+                { num: 6, name: "Love Letters to Homer", desc: "Dearest Homer, I love you..." },
+                { num: 7, name: "Blansky's Beauties", desc: "Retro glamour collectible." }
+            ],
+            bonusCar: { id: "krust_v", name: "Clown Car" },
+            skins: [
+                { id: "marge", name: "Default Marge", cost: 0, type: "default" },
+                { id: "m_prison", name: "Inmate / Prison Marge", cost: 300, type: "shop" },
+                { id: "m_pink", name: "Classy / Pink Chanel Marge", cost: 350, type: "shop" },
+                { id: "m_police", name: "Police Marge", cost: 400, type: "shop" }
+            ],
+            cars: [
+                { id: "marge_v", name: "Canyonero", type: "default", cost: 0 },
+                { id: "comic_v", name: "'70s Sports Car (Comic Guy)", type: "bonus", cost: 0 },
+                { id: "krust_v", name: "Clown Car", type: "race", cost: 0 },
+                { id: "willi_v", name: "Tractor", type: "shop", cost: 400, seller: "Willie" },
+                { id: "cKlimo", name: "Krusty's Limo", type: "shop", cost: 350, seller: "Gil" },
+                { id: "cCurator", name: "Curator's Car", type: "shop", cost: 300, seller: "Gil" }
+            ]
+        },
+        {
+            id: 5,
+            name: "Level 5: Downtown Springfield (Night)",
+            character: "Apu",
+            timeOfDay: "Night",
+            zone: "Downtown Night",
+            totalGags: 6,
+            totalWasps: 20,
+            missions: [
+                { id: "m0", name: "Tutorial / Staging", giver: "Apu", type: "tutorial" },
+                { id: "m1", name: "Mission 1: Incriminating Caffeine", giver: "Chief Wiggum", type: "story" },
+                { id: "m2", name: "Mission 2: ...And Token Wondering", giver: "Homer", type: "story" },
+                { id: "m3", name: "Mission 3: Roots of Evil", giver: "Dr. Hibbert", type: "story" },
+                { id: "m4", name: "Mission 4: A Few Good Scams", giver: "Snake", type: "story" },
+                { id: "m5", name: "Mission 5: Kwik-E-Marty", giver: "Bart", type: "story" },
+                { id: "m6", name: "Mission 6: The Fat and Furious II", giver: "Lisa", type: "story" },
+                { id: "m7", name: "Mission 7: Eight is Too Much", giver: "Manjula", type: "story" },
+                { id: "sr1", name: "Street Race 1: Point to Point", giver: "Nelson", type: "race" },
+                { id: "sr2", name: "Street Race 2: Circuit Race", giver: "Milhouse", type: "race" },
+                { id: "sr3", name: "Street Race 3: Checkpoint Race", giver: "Ralph", type: "race" },
+                { id: "bm1", name: "Bonus Mission: Curse of Were-Car", giver: "Professor Frink", type: "bonus", reward: "frink_v (Hover Car)" },
+                { id: "gr1", name: "Gamble Race: City Night Rally", giver: "Louie", type: "gamble" }
+            ],
+            cards: [
+                { num: 1, name: "Sanjay's Smuggled Cigarettes", desc: "Duty-free contraband from abroad." },
+                { num: 2, name: "Hot Dog Roller", desc: "Has this been turning since 1993?" },
+                { num: 3, name: "Squishee", desc: "An all-syrup Super-Squishee." },
+                { num: 4, name: "Apu's T-Shirt", desc: "I survived the Kwik-E-Mart robbery." },
+                { num: 5, name: "Chutney", desc: "Authentic spicy Indian chutney." },
+                { num: 6, name: "Kwik-E-Mart Apron", desc: "Thank you, come again!" },
+                { num: 7, name: "Ganesha Statue", desc: "Deity of wisdom and remover of obstacles." }
+            ],
+            bonusCar: { id: "bbman_v", name: "El Carro Loco" },
+            skins: [
+                { id: "apu", name: "Default Apu", cost: 0, type: "default" },
+                { id: "a_army", name: "American / Army Apu", cost: 375, type: "shop" },
+                { id: "a_american", name: "Bespoke / USA Flag Apu", cost: 425, type: "shop" },
+                { id: "a_besharp", name: "Be Sharps / Donut Apu", cost: 475, type: "shop" }
+            ],
+            cars: [
+                { id: "apu_v", name: "Longhorn", type: "default", cost: 0 },
+                { id: "frink_v", name: "Hover Car", type: "bonus", cost: 0 },
+                { id: "bbman_v", name: "El Carro Loco", type: "race", cost: 0 },
+                { id: "carhom_v", name: "The Car Built For Homer", type: "shop", cost: 500, seller: "Homer" },
+                { id: "wiggu_v", name: "Police Car", type: "shop", cost: 425, seller: "Gil" },
+                { id: "cCola", name: "Cola Truck", type: "shop", cost: 350, seller: "Gil" }
+            ]
+        },
+        {
+            id: 6,
+            name: "Level 6: Springfield Squidport (Night)",
+            character: "Bart",
+            timeOfDay: "Night",
+            zone: "Squidport / Observatory Night",
+            totalGags: 11,
+            totalWasps: 20,
+            missions: [
+                { id: "m0", name: "Tutorial / Staging", giver: "Bart", type: "tutorial" },
+                { id: "m1", name: "Mission 1: Going to the Luau", giver: "Otto", type: "story" },
+                { id: "m2", name: "Mission 2: Give Me Liberty or Coin", giver: "Snake", type: "story" },
+                { id: "m3", name: "Mission 3: Set To Stun", giver: "Professor Frink", type: "story" },
+                { id: "m4", name: "Mission 4: Kang & Kodos Strike Back", giver: "Homer", type: "story" },
+                { id: "m5", name: "Mission 5: Milhouse The Fugitive", giver: "Milhouse", type: "story" },
+                { id: "m6", name: "Mission 6: T&A", giver: "Chief Wiggum", type: "story" },
+                { id: "m7", name: "Mission 7: Alien 'Auto'topsy Part 1", giver: "Lisa", type: "story" },
+                { id: "sr1", name: "Street Race 1: Time Trial", giver: "Milhouse", type: "race" },
+                { id: "sr2", name: "Street Race 2: Circuit Race", giver: "Nelson", type: "race" },
+                { id: "sr3", name: "Street Race 3: Checkpoint Race", giver: "Ralph", type: "race" },
+                { id: "bm1", name: "Bonus Mission: Snake's Big Score", giver: "Snake", type: "bonus", reward: "snake_v (Bandit)" },
+                { id: "gr1", name: "Gamble Race: Harbour Burnout", giver: "Louie", type: "gamble" }
+            ],
+            cards: [
+                { num: 1, name: "Krusty Burger", desc: "Official greasy fast-food hamburger." },
+                { num: 2, name: "Kamp Krusty Flag", desc: "Welcome to Kamp Krusty!" },
+                { num: 3, name: "Itchy & Scratchy Money", desc: "It's like regular money, but with no value." },
+                { num: 4, name: "Mr. Sparkle Soap", desc: "Awesome power for dishwashing!" },
+                { num: 5, name: "Scorpio Flamethrower", desc: "Hank Scorpio's supervillain weapon." },
+                { num: 6, name: "Linus Caldwell", desc: "Heists and casino capers." },
+                { num: 7, name: "Krusty Doll", desc: "Hi, I'm Talking Krusty!" }
+            ],
+            bonusCar: { id: "burns_v", name: "Armored Truck / Limo" },
+            skins: [
+                { id: "bart", name: "Default Bart", cost: 0, type: "default" },
+                { id: "b_hugo", name: "Hugo Simpson", cost: 400, type: "shop" },
+                { id: "b_military", name: "Cadet / Military Bart", cost: 500, type: "shop" },
+                { id: "b_man", name: "Dirty / Tuxedo Bart", cost: 600, type: "shop" }
+            ],
+            cars: [
+                { id: "bart_v", name: "Ferrini - Red", type: "default", cost: 0 },
+                { id: "snake_v", name: "Bandit", type: "bonus", cost: 0 },
+                { id: "burns_v", name: "Armored Truck / Limo", type: "race", cost: 0 },
+                { id: "scorp_v", name: "Globex Super Villain Car", type: "shop", cost: 600, seller: "Kearney" },
+                { id: "cArmor", name: "Armored Truck", type: "shop", cost: 400, seller: "Gil" },
+                { id: "cSedan", name: "Chase Sedan", type: "shop", cost: 500, seller: "Gil" }
+            ]
+        },
+        {
+            id: 7,
+            name: "Level 7: Evergreen Terrace (Halloween / Spooky)",
+            character: "Homer",
+            timeOfDay: "Halloween Night",
+            zone: "Spooky Suburbs / Alien Invasion",
+            totalGags: 15,
+            totalWasps: 20,
+            missions: [
+                { id: "m0", name: "Tutorial / Staging", giver: "Homer", type: "tutorial" },
+                { id: "m1", name: "Mission 1: Rigellian Pizza", giver: "Lisa", type: "story" },
+                { id: "m2", name: "Mission 2: A Few Good Mutants", giver: "Professor Frink", type: "story" },
+                { id: "m3", name: "Mission 3: Pocket Protector", giver: "Bart", type: "story" },
+                { id: "m4", name: "Mission 4: There's Something About Monty", giver: "Mr. Burns", type: "story" },
+                { id: "m5", name: "Mission 5: Alien 'Auto'topsy Part 2", giver: "Snake", type: "story" },
+                { id: "m6", name: "Mission 6: It's a Mad, Mad Marge", giver: "Marge", type: "story" },
+                { id: "m7", name: "Mission 7: Alien 'Auto'topsy Part 3", giver: "Grampa", type: "story" },
+                { id: "sr1", name: "Street Race 1: Time Trial", giver: "Ralph", type: "race" },
+                { id: "sr2", name: "Street Race 2: Circuit Race", giver: "Nelson", type: "race" },
+                { id: "sr3", name: "Street Race 3: Checkpoint Race", giver: "Milhouse", type: "race" },
+                { id: "bm1", name: "Bonus Mission: Flaming Moes", giver: "Smithers", type: "bonus", reward: "smith_v (Hearse)" },
+                { id: "gr1", name: "Gamble Race: Spooky Speedway", giver: "Louie", type: "gamble" }
+            ],
+            cards: [
+                { num: 1, name: "Hell Toupee", desc: "The hair of Snake Jailbird." },
+                { num: 2, name: "Devil Flanders", desc: "It's always the one you least suspect!" },
+                { num: 3, name: "Soul Donut", desc: "Mmm... forbidden soul donut." },
+                { num: 4, name: "Ghost of Maude", desc: "Haunting the Flanders residence." },
+                { num: 5, name: "Evil Clown Bed", desc: "Can't sleep, clown will eat me." },
+                { num: 6, name: "Voodoo Doll", desc: "Stuck with pins and curses." },
+                { num: 7, name: "Zombie Head", desc: "Springfield graveyard resurrection." }
+            ],
+            bonusCar: { id: "fone_v", name: "Open Wheel 500 / Phone Car" },
+            skins: [
+                { id: "homer", name: "Default Homer", cost: 0, type: "default" },
+                { id: "h_scuzzy", name: "Dirty / Scuzzy Homer", cost: 400, type: "shop" },
+                { id: "h_evil", name: "Don Homer / Mafia Homer", cost: 450, type: "shop" },
+                { id: "h_donut", name: "Evil Homer / Donut Head", cost: 500, type: "shop" }
+            ],
+            cars: [
+                { id: "homer_v", name: "70s Sports Car (Homer)", type: "default", cost: 0 },
+                { id: "smith_v", name: "Hearse (Smithers)", type: "bonus", cost: 0 },
+                { id: "fone_v", name: "Open Wheel 500", type: "race", cost: 0 },
+                { id: "zombi_v", name: "Zombie Car", type: "shop", cost: 500, seller: "Zombie" },
+                { id: "hbike_v", name: "Hover Bike", type: "shop", cost: 1000, seller: "Gil" },
+                { id: "cHears", name: "Ghost Hearse", type: "shop", cost: 750, seller: "Gil" }
+            ]
+        }
+    ],
+
+    // All 60 unlockable & drivable vehicles catalog
+    allVehicles: [
+        { id: "famil_v", name: "Family Sedan", level: 1, type: "Default Car", speed: 1.0, accel: 1.5, tough: 2.5, hand: 4.0 },
+        { id: "cletu_v", name: "Pickup Truck", level: 1, type: "Bonus Mission", speed: 1.0, accel: 1.0, tough: 3.5, hand: 2.5 },
+        { id: "elect_v", name: "Electaurus", level: 1, type: "Street Race", speed: 2.0, accel: 1.5, tough: 1.5, hand: 4.0 },
+        { id: "plowk_v", name: "Plow King", level: 1, type: "Shop (Barney)", speed: 1.5, accel: 0.5, tough: 5.0, hand: 1.5 },
+        { id: "cDuff", name: "Duff Truck", level: 1, type: "Shop (Gil)", speed: 0.5, accel: 0.5, tough: 4.0, hand: 1.0 },
+        { id: "cVan", name: "Surveillance Van", level: 1, type: "Shop (Gil)", speed: 1.5, accel: 1.5, tough: 3.5, hand: 3.0 },
+        { id: "rocke_v", name: "Rocket Car", level: 1, type: "Card Collector", speed: 5.0, accel: 5.0, tough: 1.0, hand: 4.5 },
+        { id: "redbrick", name: "Red Brick Car", level: 1, type: "Secret Easter Egg", speed: 4.0, accel: 3.5, tough: 5.0, hand: 3.0 },
+
+        { id: "honor_v", name: "Honor Roller", level: 2, type: "Default Car", speed: 1.5, accel: 2.0, tough: 1.5, hand: 5.0 },
+        { id: "gramp_v", name: "WWII Jeep", level: 2, type: "Bonus Mission", speed: 1.5, accel: 1.5, tough: 3.5, hand: 3.0 },
+        { id: "moe_v", name: "Sedan (Moe's)", level: 2, type: "Street Race", speed: 2.0, accel: 1.5, tough: 2.5, hand: 3.5 },
+        { id: "mrplo_v", name: "Mr. Plow", level: 2, type: "Shop (Homer)", speed: 2.0, accel: 1.5, tough: 3.5, hand: 3.0 },
+        { id: "cLimo", name: "Limousine", level: 2, type: "Shop (Gil)", speed: 1.5, accel: 1.5, tough: 3.5, hand: 2.5 },
+        { id: "cFire_v", name: "Fire Truck", level: 2, type: "Shop (Gil)", speed: 3.0, accel: 0.5, tough: 5.0, hand: 1.0 },
+        { id: "mono_v", name: "Monorail Car", level: 2, type: "Card Collector", speed: 4.5, accel: 4.0, tough: 2.5, hand: 4.0 },
+
+        { id: "lisa_v", name: "Malibu Stacy Car", level: 3, type: "Default Car", speed: 2.5, accel: 3.0, tough: 1.5, hand: 4.5 },
+        { id: "skinn_v", name: "Sedan (Skinner's)", level: 3, type: "Bonus Mission", speed: 2.0, accel: 2.0, tough: 2.5, hand: 3.0 },
+        { id: "bookb_v", name: "Book Burning Van", level: 3, type: "Street Race", speed: 2.0, accel: 1.5, tough: 3.5, hand: 2.5 },
+        { id: "otto_v", name: "School Bus", level: 3, type: "Shop (Otto)", speed: 2.0, accel: 1.0, tough: 5.0, hand: 2.0 },
+        { id: "cDonut", name: "Donut Truck", level: 3, type: "Shop (Gil)", speed: 0.5, accel: 1.5, tough: 3.0, hand: 3.0 },
+        { id: "cNerd", name: "Nerd Car", level: 3, type: "Shop (Gil)", speed: 1.5, accel: 2.5, tough: 2.5, hand: 4.0 },
+        { id: "knigh_v", name: "Knight Boat", level: 3, type: "Card Collector", speed: 3.5, accel: 3.0, tough: 3.0, hand: 3.5 },
+
+        { id: "marge_v", name: "Canyonero", level: 4, type: "Default Car", speed: 2.5, accel: 1.5, tough: 4.0, hand: 3.0 },
+        { id: "comic_v", name: "'70s Sports Car (Comic Guy)", level: 4, type: "Bonus Mission", speed: 2.5, accel: 2.0, tough: 3.0, hand: 4.0 },
+        { id: "krust_v", name: "Clown Car", level: 4, type: "Street Race", speed: 3.0, accel: 3.0, tough: 1.5, hand: 5.0 },
+        { id: "willi_v", name: "Tractor", level: 4, type: "Shop (Willie)", speed: 3.0, accel: 2.5, tough: 3.5, hand: 3.5 },
+        { id: "cKlimo", name: "Krusty's Limo", level: 4, type: "Shop (Gil)", speed: 2.5, accel: 2.0, tough: 4.0, hand: 2.5 },
+        { id: "cCurator", name: "Curator's Car", level: 4, type: "Shop (Gil)", speed: 2.5, accel: 3.0, tough: 2.5, hand: 4.5 },
+        { id: "hype_v", name: "Hover Car (Card)", level: 4, type: "Card Collector", speed: 4.0, accel: 4.0, tough: 2.0, hand: 4.5 },
+
+        { id: "apu_v", name: "Longhorn", level: 5, type: "Default Car", speed: 3.5, accel: 3.5, tough: 2.5, hand: 3.5 },
+        { id: "frink_v", name: "Hover Car", level: 5, type: "Bonus Mission", speed: 4.0, accel: 4.0, tough: 1.0, hand: 3.0 },
+        { id: "bbman_v", name: "El Carro Loco", level: 5, type: "Street Race", speed: 4.0, accel: 3.0, tough: 2.5, hand: 3.5 },
+        { id: "carhom_v", name: "The Car Built For Homer", level: 5, type: "Shop (Homer)", speed: 4.5, accel: 3.5, tough: 3.5, hand: 3.0 },
+        { id: "wiggu_v", name: "Police Car", level: 5, type: "Shop (Gil)", speed: 4.0, accel: 3.5, tough: 3.0, hand: 4.0 },
+        { id: "cCola", name: "Cola Truck", level: 5, type: "Shop (Gil)", speed: 3.0, accel: 1.0, tough: 5.0, hand: 1.0 },
+        { id: "dune_v", name: "Monster Truck / Dune Buggy", level: 5, type: "Card Collector", speed: 4.5, accel: 3.5, tough: 4.0, hand: 3.5 },
+
+        { id: "bart_v", name: "Ferrini - Red", level: 6, type: "Default Car", speed: 4.0, accel: 4.0, tough: 1.5, hand: 5.0 },
+        { id: "snake_v", name: "Bandit", level: 6, type: "Bonus Mission", speed: 4.5, accel: 4.0, tough: 2.5, hand: 4.5 },
+        { id: "burns_v", name: "Armored Truck / Limo", level: 6, type: "Street Race", speed: 4.0, accel: 2.5, tough: 3.5, hand: 4.0 },
+        { id: "scorp_v", name: "Globex Super Villain Car", level: 6, type: "Shop (Kearney)", speed: 4.5, accel: 4.5, tough: 1.5, hand: 4.0 },
+        { id: "cArmor", name: "Armored Truck", level: 6, type: "Shop (Gil)", speed: 1.5, accel: 1.5, tough: 5.0, hand: 1.5 },
+        { id: "cSedan", name: "Chase Sedan", level: 6, type: "Shop (Gil)", speed: 4.0, accel: 4.5, tough: 3.0, hand: 4.5 },
+        { id: "fone_v", name: "Open Wheel 500", level: 6, type: "Card Collector", speed: 5.0, accel: 5.0, tough: 0.5, hand: 5.0 },
+
+        { id: "homer_v", name: "70s Sports Car (Homer)", level: 7, type: "Default Car", speed: 4.5, accel: 4.5, tough: 2.0, hand: 4.0 },
+        { id: "smith_v", name: "Hearse (Smithers)", level: 7, type: "Bonus Mission", speed: 4.5, accel: 3.0, tough: 4.5, hand: 3.5 },
+        { id: "zombi_v", name: "Zombie Car", level: 7, type: "Shop (Zombie)", speed: 4.5, accel: 5.0, tough: 1.5, hand: 4.5 },
+        { id: "hbike_v", name: "Hover Bike", level: 7, type: "Shop (Gil)", speed: 5.0, accel: 4.5, tough: 1.0, hand: 3.5 },
+        { id: "cHears", name: "Ghost Hearse", level: 7, type: "Shop (Gil)", speed: 4.5, accel: 4.5, tough: 3.5, hand: 4.0 },
+        { id: "oblit_v", name: "Obliterator / RC Car", level: 7, type: "Card Collector", speed: 4.5, accel: 5.0, tough: 2.0, hand: 4.5 },
+
+        // Secret / Bonus Cheat Cars
+        { id: "gramR_v", name: "Grampa's Rocket", level: 0, type: "Cheat / Bonus", speed: 5.0, accel: 5.0, tough: 3.5, hand: 3.0 },
+        { id: "coffin", name: "Coffin Car", level: 0, type: "Cheat / Bonus", speed: 4.5, accel: 4.0, tough: 2.5, hand: 3.5 },
+        { id: "hallo", name: "Halloween Hearse", level: 0, type: "Cheat / Bonus", speed: 4.5, accel: 4.5, tough: 3.0, hand: 4.0 },
+        { id: "witchcar", name: "Witch Broom", level: 0, type: "Cheat / Bonus", speed: 4.5, accel: 4.5, tough: 1.5, hand: 4.5 },
+        { id: "cBlbart", name: "Black Ferrini", level: 0, type: "Cheat / Bonus", speed: 4.5, accel: 4.5, tough: 2.0, hand: 5.0 },
+        { id: "cBone", name: "Bone Car", level: 0, type: "Cheat / Bonus", speed: 4.0, accel: 4.0, tough: 3.0, hand: 4.0 },
+        { id: "cCube", name: "Cube Car", level: 0, type: "Cheat / Bonus", speed: 4.0, accel: 4.0, tough: 4.0, hand: 3.5 },
+        { id: "taxiA", name: "Springfield Taxi", level: 0, type: "Traffic / Hidden", speed: 3.0, accel: 2.5, tough: 3.0, hand: 3.5 },
+        { id: "garbage", name: "Garbage Truck", level: 0, type: "Traffic / Hidden", speed: 2.0, accel: 1.0, tough: 5.0, hand: 1.5 },
+        { id: "icecream", name: "Ice Cream Truck", level: 0, type: "Traffic / Hidden", speed: 2.0, accel: 1.5, tough: 3.5, hand: 2.5 },
+        { id: "pizza", name: "Pizza Van", level: 0, type: "Traffic / Hidden", speed: 2.5, accel: 2.5, tough: 3.0, hand: 3.5 }
+    ]
+};
+
+    </script>
+    <script>
+// The Simpsons: Hit & Run - Save Game Binary Parser & Serializer
+// Supports Original Xbox binary saves ("05") and PC saves
+
+class SharSaveGame {
+    constructor() {
+        this.rawBuffer = null;
+        this.dataView = null;
+        this.bytes = null;
+        this.isLoaded = false;
+        this.filename = "05";
+        this.isXbox = true;
+
+        // Model state
+        this.fileSize = 7218;
+        this.timestamp = {
+            year: 2026,
+            month: 8,
+            day: 23,
+            hour: 18,
+            minute: 26,
+            second: 33,
+            subsecond: 1978
+        };
+        this.headerLevel = 1;
+        this.headerMission = 1;
+        this.profileName = "Player1";
+
+        // Levels 1..7 data
+        this.levels = [];
+        for (let i = 1; i <= 7; i++) {
+            this.levels.push({
+                levelNum: i,
+                isUnlocked: i === 1,
+                activeSkin: "NULL",
+                cards: Array(7).fill(false),
+                cardNames: Array(7).fill("NULL"),
+                missions: {},
+                gagsFound: 0,
+                waspsDestroyed: 0
+            });
+        }
+
+        // Global state
+        this.currentLevel = 1;
+        this.currentMission = 1;
+        this.coins = 0;
+
+        // 60 Vehicle slots
+        this.vehicles = [];
+
+        // Audio & options
+        this.sfxVolume = 0.84;
+        this.musicVolume = 0.88;
+        this.dialogVolume = 0.88;
+    }
+
+    load(arrayBuffer, filename = "05") {
+        this.rawBuffer = arrayBuffer.slice(0);
+        this.bytes = new Uint8Array(this.rawBuffer);
+        this.dataView = new DataView(this.rawBuffer);
+        this.filename = filename;
+        this.fileSize = this.bytes.length;
+
+        // Check if Xbox (7218 bytes) or PC/other
+        this.isXbox = this.fileSize >= 7194;
+
+        this.parse();
+        this.isLoaded = true;
+    }
+
+    parse() {
+        const dv = this.dataView;
+        const u8 = this.bytes;
+
+        // --- 1. Header (0x00 to 0x14) ---
+        // 0x00: uint32 total size
+        // 0x04: uint16 subsecond
+        // 0x06: uint16 year
+        // 0x08: uint8 month, 0x09: day, 0x0A: hour, 0x0B: min, 0x0C: sec
+        // 0x0E: uint8 headerLevel, 0x0F: uint8 headerMission
+        if (this.fileSize >= 20) {
+            this.timestamp.subsecond = dv.getUint16(0x04, true);
+            this.timestamp.year = dv.getUint16(0x06, true) || new Date().getFullYear();
+            this.timestamp.month = u8[0x08] || (new Date().getMonth() + 1);
+            this.timestamp.day = u8[0x09] || new Date().getDate();
+            this.timestamp.hour = u8[0x0A] || new Date().getHours();
+            this.timestamp.minute = u8[0x0B] || new Date().getMinutes();
+            this.timestamp.second = u8[0x0C] || new Date().getSeconds();
+            this.headerLevel = u8[0x0E] || 1;
+            this.headerMission = u8[0x0F] || 1;
+        }
+
+        // Profile name: 0x15..0x25 (16 bytes null terminated)
+        this.profileName = this.readString(0x15, 16) || "Player1";
+
+        // --- 2. Levels 1 to 7 (620 bytes each, starts at 0x25) ---
+        for (let lvlIdx = 0; lvlIdx < 7; lvlIdx++) {
+            const base = 0x25 + lvlIdx * 620;
+            const lvlObj = this.levels[lvlIdx];
+
+            // 7 Cards (each 17 bytes: 16 bytes string + 1 byte flag)
+            lvlObj.cards = [];
+            lvlObj.cardNames = [];
+            for (let c = 0; c < 7; c++) {
+                const cOff = base + c * 17;
+                const cName = this.readString(cOff, 16);
+                const cCollected = u8[cOff + 16] === 1;
+                lvlObj.cardNames.push(cName);
+                lvlObj.cards.push(cCollected);
+            }
+
+            // 13 Missions (each 32 bytes: starts at base + 120 = 0x078 in block)
+            // m0..m7, sr1, sr2, sr3, bm1, gr1
+            lvlObj.missions = {};
+            const missionKeys = ["m0", "m1", "m2", "m3", "m4", "m5", "m6", "m7", "sr1", "sr2", "sr3", "bm1", "gr1"];
+            for (let m = 0; m < 13; m++) {
+                const mOff = base + 120 + m * 32;
+                const mName = this.readString(mOff, 16) || missionKeys[m];
+                const isCompleted = dv.getInt32(mOff + 16, true) === 1;
+                const unlockState = dv.getInt32(mOff + 20, true); // 2 = unlocked/available, 0 = locked
+                const bestTime = dv.getInt32(mOff + 24, true);
+                const secondaryStat = dv.getInt32(mOff + 28, true);
+
+                lvlObj.missions[missionKeys[m]] = {
+                    name: mName,
+                    completed: isCompleted,
+                    unlocked: unlockState > 0,
+                    bestTime: bestTime,
+                    secondaryStat: secondaryStat
+                };
+            }
+
+            // Trailing 84 bytes in level (base + 536 to base + 620)
+            const extraBase = base + 536;
+            lvlObj.isUnlocked = dv.getInt32(extraBase + 12, true) === 1 || lvlIdx === 0;
+            lvlObj.activeSkin = this.readString(extraBase + 16, 16) || "NULL";
+            
+            // Gags bitmask / count
+            const gagVal = dv.getUint32(extraBase + 32, true);
+            lvlObj.gagsFound = this.countBits(gagVal);
+            lvlObj.rawGagMask = gagVal;
+
+            // Wasp count
+            const waspVal = dv.getUint32(extraBase + 36, true);
+            lvlObj.waspsDestroyed = waspVal;
+        }
+
+        // --- 3. Global State (0x1119 to 0x1131) ---
+        // 0x1125: currentLevel (1-indexed)
+        // 0x1129: currentMission
+        // 0x112D: coins (uint32)
+        if (this.fileSize >= 0x1131) {
+            this.currentLevel = dv.getUint32(0x1125, true) || 1;
+            this.currentMission = dv.getUint32(0x1129, true) || 1;
+            this.coins = dv.getUint32(0x112D, true);
+        }
+
+        // --- 4. 60 Vehicles (0x1131 to 0x16D1, 24 bytes each) ---
+        this.vehicles = [];
+        if (this.fileSize >= 0x16D1) {
+            for (let v = 0; v < 60; v++) {
+                const vOff = 0x1131 + v * 24;
+                const vName = this.readString(vOff, 16) || "n/a";
+                const health = dv.getFloat32(vOff + 16, true);
+                const damage = dv.getFloat32(vOff + 20, true);
+
+                const isOwned = vName !== "n/a" && vName !== "" && vName !== "NULL";
+                this.vehicles.push({
+                    slot: v,
+                    id: vName,
+                    isOwned: isOwned,
+                    health: isOwned ? Math.max(0, health) : 1.0,
+                    damage: damage
+                });
+            }
+        }
+
+        // --- 5. Audio & Volume (0x1BF5 to 0x1C09) ---
+        if (this.fileSize >= 0x1C10) {
+            this.sfxVolume = dv.getFloat32(0x1BF9, true);
+            this.musicVolume = dv.getFloat32(0x1BFD, true);
+            this.dialogVolume = dv.getFloat32(0x1C01, true);
+        }
+    }
+
+    countBits(n) {
+        let count = 0;
+        let v = n >>> 0;
+        while (v > 0) {
+            count += v & 1;
+            v = v >>> 1;
+        }
+        return count;
+    }
+
+    readString(offset, maxLength) {
+        let s = "";
+        for (let i = 0; i < maxLength; i++) {
+            const b = this.bytes[offset + i];
+            if (b === 0) break;
+            s += String.fromCharCode(b);
+        }
+        return s;
+    }
+
+    writeString(offset, str, maxLength) {
+        for (let i = 0; i < maxLength; i++) {
+            if (i < str.length) {
+                this.bytes[offset + i] = str.charCodeAt(i);
+            } else {
+                this.bytes[offset + i] = 0;
+            }
+        }
+    }
+
+    // Save and serialize changes back into the buffer
+    serialize() {
+        const dv = this.dataView;
+        const u8 = this.bytes;
+
+        // 1. Update Header
+        dv.setUint16(0x04, this.timestamp.subsecond || 1978, true);
+        dv.setUint16(0x06, this.timestamp.year, true);
+        u8[0x08] = this.timestamp.month;
+        u8[0x09] = this.timestamp.day;
+        u8[0x0A] = this.timestamp.hour;
+        u8[0x0B] = this.timestamp.minute;
+        u8[0x0C] = this.timestamp.second;
+        u8[0x0E] = this.currentLevel;
+        u8[0x0F] = this.currentMission;
+
+        // Profile name
+        this.writeString(0x15, this.profileName, 16);
+
+        // 2. Update Levels 1 to 7
+        for (let lvlIdx = 0; lvlIdx < 7; lvlIdx++) {
+            const base = 0x25 + lvlIdx * 620;
+            const lvlObj = this.levels[lvlIdx];
+
+            // 7 Cards
+            for (let c = 0; c < 7; c++) {
+                const cOff = base + c * 17;
+                const isCollected = lvlObj.cards[c];
+                // In game, collected card string is e.g. "Cardx" or card name, flag = 1
+                const cName = isCollected ? (lvlObj.cardNames[c] === "NULL" ? "Cardx" : lvlObj.cardNames[c]) : "NULL";
+                this.writeString(cOff, cName, 16);
+                u8[cOff + 16] = isCollected ? 1 : 0;
+            }
+
+            // 13 Missions
+            const missionKeys = ["m0", "m1", "m2", "m3", "m4", "m5", "m6", "m7", "sr1", "sr2", "sr3", "bm1", "gr1"];
+            for (let m = 0; m < 13; m++) {
+                const mOff = base + 120 + m * 32;
+                const k = missionKeys[m];
+                const mData = lvlObj.missions[k] || { completed: false, unlocked: false, bestTime: 0, secondaryStat: -1 };
+                
+                this.writeString(mOff, k, 16);
+                dv.setInt32(mOff + 16, mData.completed ? 1 : 0, true);
+                dv.setInt32(mOff + 20, mData.completed ? 2 : (mData.unlocked ? 2 : 0), true);
+                dv.setInt32(mOff + 24, mData.bestTime || 0, true);
+                dv.setInt32(mOff + 28, mData.secondaryStat ?? -1, true);
+            }
+
+            // Trailing 84 bytes in level
+            const extraBase = base + 536;
+            dv.setInt32(extraBase + 12, lvlObj.isUnlocked ? 1 : 0, true);
+            this.writeString(extraBase + 16, lvlObj.activeSkin || "NULL", 16);
+
+            // Wasps & Gags
+            dv.setUint32(extraBase + 36, lvlObj.waspsDestroyed || 0, true);
+        }
+
+        // 3. Update Global State
+        dv.setUint32(0x1125, this.currentLevel, true);
+        dv.setUint32(0x1129, this.currentMission, true);
+        dv.setUint32(0x112D, this.coins, true);
+
+        // 4. Update Vehicles
+        for (let v = 0; v < 60; v++) {
+            const vOff = 0x1131 + v * 24;
+            const vData = this.vehicles[v];
+            if (vData && vData.isOwned && vData.id && vData.id !== "n/a" && vData.id !== "NULL") {
+                this.writeString(vOff, vData.id, 16);
+                dv.setFloat32(vOff + 16, vData.health ?? 1.0, true);
+                dv.setFloat32(vOff + 20, vData.damage ?? -1.0, true);
+            } else {
+                this.writeString(vOff, "n/a", 16);
+                dv.setFloat32(vOff + 16, -1.0, true);
+                dv.setFloat32(vOff + 20, -1.0, true);
+            }
+        }
+
+        // 5. Update Audio
+        if (this.fileSize >= 0x1C10) {
+            dv.setFloat32(0x1BF9, this.sfxVolume, true);
+            dv.setFloat32(0x1BFD, this.musicVolume, true);
+            dv.setFloat32(0x1C01, this.dialogVolume, true);
+        }
+
+        return this.bytes;
+    }
+
+    // Quick Action Presets
+    maxCoins() {
+        this.coins = 999999;
+    }
+
+    unlockAllVehicles() {
+        // Collect all distinct vehicles from metadata
+        const list = SHAR_DATA.allVehicles.map(v => v.id);
+        for (let i = 0; i < 60; i++) {
+            if (i < list.length) {
+                this.vehicles[i] = {
+                    slot: i,
+                    id: list[i],
+                    isOwned: true,
+                    health: 1.0,
+                    damage: -1.0
+                };
+            }
+        }
+    }
+
+    repairAllVehicles() {
+        for (const v of this.vehicles) {
+            if (v.isOwned) {
+                v.health = 1.0;
+                v.damage = -1.0;
+            }
+        }
+    }
+
+    unlockAllCards() {
+        for (let lvl = 0; lvl < 7; lvl++) {
+            for (let c = 0; c < 7; c++) {
+                this.levels[lvl].cards[c] = true;
+                this.levels[lvl].cardNames[c] = "Cardx";
+            }
+        }
+    }
+
+    completeAllMissions() {
+        for (let lvl = 0; lvl < 7; lvl++) {
+            this.levels[lvl].isUnlocked = true;
+            for (const key of Object.keys(this.levels[lvl].missions)) {
+                this.levels[lvl].missions[key].completed = true;
+                this.levels[lvl].missions[key].unlocked = true;
+            }
+        }
+    }
+
+    complete100Percent() {
+        this.maxCoins();
+        this.unlockAllVehicles();
+        this.repairAllVehicles();
+        this.unlockAllCards();
+        this.completeAllMissions();
+        for (let lvl = 0; lvl < 7; lvl++) {
+            this.levels[lvl].isUnlocked = true;
+            this.levels[lvl].waspsDestroyed = SHAR_DATA.levels[lvl].totalWasps;
+            this.levels[lvl].gagsFound = SHAR_DATA.levels[lvl].totalGags;
+        }
+    }
+
+    // Generate Xbox SaveMeta.xbx string (UTF-16LE with BOM)
+    generateSaveMeta() {
+        const month = String(this.timestamp.month).padStart(2, '0');
+        const day = String(this.timestamp.day).padStart(2, '0');
+        const year = String(this.timestamp.year).slice(-2);
+        const hour = String(this.timestamp.hour).padStart(2, '0');
+        const min = String(this.timestamp.minute).padStart(2, '0');
+        const sec = String(this.timestamp.second).padStart(2, '0');
+
+        const titleText = `Name = (L${this.currentLevel} M${this.currentMission})    ${month}/${day}/${year} ${hour}:${min}:${sec}\r\n\r\n`;
+        
+        // Convert to UTF-16LE ArrayBuffer with 0xFEFF BOM
+        const buffer = new ArrayBuffer(2 + titleText.length * 2);
+        const view = new DataView(buffer);
+        view.setUint16(0, 0xFEFF, true); // BOM
+        for (let i = 0; i < titleText.length; i++) {
+            view.setUint16(2 + i * 2, titleText.charCodeAt(i), true);
+        }
+        return new Uint8Array(buffer);
+    }
+}
+
+    </script>
+    <script>
+const SAMPLE_SAVE_B64 = "MhwAALoH6gcIFxIaIQABARocAAD/UGxheWVyMQAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAAQ2FyZHgAAAAAAAAAAAAAAAFOVUxMAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAATlVMTAAAAAAAAAAAAAAAAABOVUxMAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAAAG0wAEwAAAAAAAAAAAAAAAABAAAAAgAAAAAAAAD/////bTEATAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAP////9tMgBMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////20zAEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////bTQATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9tNQBMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////202AEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////bTcATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9zcjEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////3NyMgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////c3IzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9ibTEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////2dyMQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////AAAAAAAAAAAAAAAAAQAAAE5VTEwAAAAAAAAAAAAAAAABAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATlVMTAAAAAAAAAAAAAAAAABOVUxMAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAATlVMTAAAAAAAAAAAAAAAAABOVUxMAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAATlVMTAAAAAAAAAAAAAAAAAAATlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////8AAAAAAAAAAAAAAAAAAAAATlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABOVUxMAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAATlVMTAAAAAAAAAAAAAAAAABOVUxMAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAATlVMTAAAAAAAAAAAAAAAAABOVUxMAAAAAAAAAAAAAAAAAABOVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////wAAAAAAAAAAAAAAAAAAAABOVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAATlVMTAAAAAAAAAAAAAAAAABOVUxMAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAATlVMTAAAAAAAAAAAAAAAAABOVUxMAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////AAAAAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATlVMTAAAAAAAAAAAAAAAAABOVUxMAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAATlVMTAAAAAAAAAAAAAAAAABOVUxMAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAATlVMTAAAAAAAAAAAAAAAAAAATlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////8AAAAAAAAAAAAAAAAAAAAATlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABOVUxMAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAATlVMTAAAAAAAAAAAAAAAAABOVUxMAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAATlVMTAAAAAAAAAAAAAAAAABOVUxMAAAAAAAAAAAAAAAAAABOVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////wAAAAAAAAAAAAAAAAAAAABOVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAATlVMTAAAAAAAAAAAAAAAAABOVUxMAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAATlVMTAAAAAAAAAAAAAAAAABOVUxMAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////05VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////TlVMTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP////9OVUxMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/////AAAAAAAAAAAAAAAAAAAAAE5VTEwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAAEAAABJAAAAZmFtaWxfdgAAAAAAAAAAAPG/Sj8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/bi9hAAAAAAAAAAAAAAAAAAAAgL8AAIC/AQAAAP////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////9//////////////////////v//G/D////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////f//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8AAAAAPQpXP65HYT+uR2E/AACAPwEbAAANDQ0N/60xBAABAgAAAAAAAJveGve85VYF9ojfo81H9tKwOQZ5";
+
+    </script>
+    <script>
+// The Simpsons: Hit & Run - Save Editor Web Application Logic
+
+let save = new SharSaveGame();
+let currentLevelView = 1;
+let currentGarageFilter = "all";
+
+// DOM Elements
+const toastEl = document.getElementById("toast");
+const lblProfile = document.getElementById("lbl-profile");
+const lblCurrentProgress = document.getElementById("lbl-current-progress");
+const lblCoinsStat = document.getElementById("lbl-coins-stat");
+const lblCardsStat = document.getElementById("lbl-cards-stat");
+const lblCarsStat = document.getElementById("lbl-cars-stat");
+
+// Progress elements
+const progMissionsText = document.getElementById("prog-missions-text");
+const progMissionsBar = document.getElementById("prog-missions-bar");
+const progCardsText = document.getElementById("prog-cards-text");
+const progCardsBar = document.getElementById("prog-cards-bar");
+const progCarsText = document.getElementById("prog-cars-text");
+const progCarsBar = document.getElementById("prog-cars-bar");
+const progWaspsText = document.getElementById("prog-wasps-text");
+const progWaspsBar = document.getElementById("prog-wasps-bar");
+
+// Inputs
+const inputProfileName = document.getElementById("input-profile-name");
+const inputCoins = document.getElementById("input-coins");
+const selectCurrentLevel = document.getElementById("select-current-level");
+const selectCurrentMission = document.getElementById("select-current-mission");
+const inputYear = document.getElementById("input-year");
+const inputMonth = document.getElementById("input-month");
+const inputDay = document.getElementById("input-day");
+const inputTime = document.getElementById("input-time");
+const metaPreviewText = document.getElementById("meta-preview-text");
+
+// Audio sliders
+const rangeSfx = document.getElementById("range-sfx");
+const rangeMusic = document.getElementById("range-music");
+const rangeDialog = document.getElementById("range-dialog");
+const valSfx = document.getElementById("val-sfx");
+const valMusic = document.getElementById("val-music");
+const valDialog = document.getElementById("val-dialog");
+
+// Initialize Application
+window.addEventListener("DOMContentLoaded", () => {
+    setupTabNavigation();
+    setupDropzone();
+    setupFileInput();
+    setupEventListeners();
+
+    // Auto-load sample save if available
+    if (typeof SAMPLE_SAVE_B64 !== "undefined") {
+        loadSampleSaveFromB64(SAMPLE_SAVE_B64);
+    }
+});
+
+function showToast(message, isError = false) {
+    toastEl.textContent = message;
+    toastEl.style.borderLeftColor = isError ? "var(--danger-red)" : "var(--simpson-yellow)";
+    toastEl.classList.remove("hidden");
+    setTimeout(() => {
+        toastEl.classList.add("hidden");
+    }, 3500);
+}
+
+// Convert Base64 to ArrayBuffer
+function b64ToArrayBuffer(base64) {
+    const binaryString = atob(base64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes.buffer;
+}
+
+function loadSampleSaveFromB64(b64) {
+    try {
+        const buffer = b64ToArrayBuffer(b64);
+        save.load(buffer, "05");
+        updateUI();
+        showToast("🍩 Sample Xbox Save (05) successfully loaded!");
+    } catch (e) {
+        console.error(e);
+        showToast("Error loading sample save: " + e.message, true);
+    }
+}
+
+// Setup Tab Navigation
+function setupTabNavigation() {
+    const tabs = document.querySelectorAll(".nav-tab");
+    tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            tabs.forEach(t => t.classList.remove("active"));
+            document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+
+            tab.classList.add("active");
+            const targetId = tab.getAttribute("data-tab");
+            const pane = document.getElementById(targetId);
+            if (pane) pane.classList.add("active");
+
+            if (targetId === "tab-hex") {
+                renderHexViewer(0);
+            }
+        });
+    });
+}
+
+// File Drag and Drop & Input
+function setupDropzone() {
+    const dropzone = document.getElementById("dropzone");
+    if (!dropzone) return;
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, () => dropzone.classList.add('dragover'), false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, () => dropzone.classList.remove('dragover'), false);
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length > 0) {
+            handleFile(files[0]);
+        }
+    });
+}
+
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+function setupFileInput() {
+    const fileInput = document.getElementById("file-input");
+    if (!fileInput) return;
+    fileInput.addEventListener("change", (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+            handleFile(e.target.files[0]);
+        }
+    });
+}
+
+function handleFile(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const buffer = e.target.result;
+            save.load(buffer, file.name);
+            updateUI();
+            showToast(`✅ Loaded save file: "${file.name}" (${save.fileSize} bytes)`);
+        } catch (err) {
+            console.error(err);
+            showToast("Failed to parse save file: " + err.message, true);
+        }
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+// Setup Event Listeners
+function setupEventListeners() {
+    // Quick Buttons
+    document.getElementById("btn-load-sample").addEventListener("click", () => {
+        if (typeof SAMPLE_SAVE_B64 !== "undefined") {
+            loadSampleSaveFromB64(SAMPLE_SAVE_B64);
+        }
+    });
+
+    // Profile & Inputs
+    inputProfileName.addEventListener("input", (e) => {
+        save.profileName = e.target.value;
+        lblProfile.textContent = save.profileName;
+    });
+
+    inputCoins.addEventListener("input", (e) => {
+        save.coins = Math.max(0, parseInt(e.target.value) || 0);
+        lblCoinsStat.textContent = save.coins.toLocaleString();
+    });
+
+    document.getElementById("btn-quick-max-coins").addEventListener("click", () => {
+        save.maxCoins();
+        inputCoins.value = save.coins;
+        lblCoinsStat.textContent = save.coins.toLocaleString();
+        showToast("💰 Set Coins to 999,999!");
+    });
+
+    selectCurrentLevel.addEventListener("change", (e) => {
+        save.currentLevel = parseInt(e.target.value);
+        updateMetaPreview();
+        updateSidebarStats();
+    });
+
+    selectCurrentMission.addEventListener("change", (e) => {
+        save.currentMission = parseInt(e.target.value);
+        updateMetaPreview();
+        updateSidebarStats();
+    });
+
+    // Timestamp
+    inputYear.addEventListener("input", (e) => {
+        save.timestamp.year = parseInt(e.target.value) || 2026;
+        updateMetaPreview();
+    });
+    inputMonth.addEventListener("input", (e) => {
+        save.timestamp.month = Math.min(12, Math.max(1, parseInt(e.target.value) || 1));
+        updateMetaPreview();
+    });
+    inputDay.addEventListener("input", (e) => {
+        save.timestamp.day = Math.min(31, Math.max(1, parseInt(e.target.value) || 1));
+        updateMetaPreview();
+    });
+    inputTime.addEventListener("input", (e) => {
+        const parts = e.target.value.split(":");
+        if (parts.length >= 3) {
+            save.timestamp.hour = parseInt(parts[0]) || 0;
+            save.timestamp.minute = parseInt(parts[1]) || 0;
+            save.timestamp.second = parseInt(parts[2]) || 0;
+        }
+        updateMetaPreview();
+    });
+
+    document.getElementById("btn-set-timestamp-now").addEventListener("click", () => {
+        const now = new Date();
+        save.timestamp.year = now.getFullYear();
+        save.timestamp.month = now.getMonth() + 1;
+        save.timestamp.day = now.getDate();
+        save.timestamp.hour = now.getHours();
+        save.timestamp.minute = now.getMinutes();
+        save.timestamp.second = now.getSeconds();
+
+        inputYear.value = save.timestamp.year;
+        inputMonth.value = save.timestamp.month;
+        inputDay.value = save.timestamp.day;
+        inputTime.value = `${String(save.timestamp.hour).padStart(2, '0')}:${String(save.timestamp.minute).padStart(2, '0')}:${String(save.timestamp.second).padStart(2, '0')}`;
+        updateMetaPreview();
+        showToast("🕒 Timestamp synced to current local time!");
+    });
+
+    // Audio Sliders
+    rangeSfx.addEventListener("input", (e) => {
+        save.sfxVolume = parseFloat(e.target.value);
+        valSfx.textContent = `${Math.round(save.sfxVolume * 100)}%`;
+    });
+    rangeMusic.addEventListener("input", (e) => {
+        save.musicVolume = parseFloat(e.target.value);
+        valMusic.textContent = `${Math.round(save.musicVolume * 100)}%`;
+    });
+    rangeDialog.addEventListener("input", (e) => {
+        save.dialogVolume = parseFloat(e.target.value);
+        valDialog.textContent = `${Math.round(save.dialogVolume * 100)}%`;
+    });
+
+    // Quick Cheats
+    document.getElementById("cheat-100").addEventListener("click", () => {
+        save.complete100Percent();
+        updateUI();
+        showToast("🌟 Applied 100% Game Completion Cheat!");
+    });
+    document.getElementById("cheat-max-coins").addEventListener("click", () => {
+        save.maxCoins();
+        updateUI();
+        showToast("💰 Maximum Coins Granted (999,999)!");
+    });
+    document.getElementById("cheat-all-cars").addEventListener("click", () => {
+        save.unlockAllVehicles();
+        save.repairAllVehicles();
+        updateUI();
+        showToast("🚗 All 60 Vehicles Unlocked & Repaired!");
+    });
+    document.getElementById("cheat-all-cards").addEventListener("click", () => {
+        save.unlockAllCards();
+        updateUI();
+        showToast("🃏 All 49 Collector Cards Unlocked!");
+    });
+    document.getElementById("cheat-all-missions").addEventListener("click", () => {
+        save.completeAllMissions();
+        updateUI();
+        showToast("🎯 All Story & Side Missions Completed!");
+    });
+    document.getElementById("cheat-repair-all").addEventListener("click", () => {
+        save.repairAllVehicles();
+        updateUI();
+        showToast("🔧 All Vehicles 100% Repaired!");
+    });
+
+    // Garage Actions
+    document.getElementById("btn-garage-unlock-all").addEventListener("click", () => {
+        save.unlockAllVehicles();
+        updateUI();
+        showToast("🚗 All 60 Vehicles Added to Garage!");
+    });
+    document.getElementById("btn-garage-repair-all").addEventListener("click", () => {
+        save.repairAllVehicles();
+        updateUI();
+        showToast("🔧 All Garage Vehicles 100% Repaired!");
+    });
+
+    // Cards Tab Action
+    document.getElementById("btn-collect-all-cards").addEventListener("click", () => {
+        save.unlockAllCards();
+        updateUI();
+        showToast("✨ Collected All 49 Cards!");
+    });
+
+    // Garage Filters
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentGarageFilter = btn.getAttribute("data-filter");
+            renderGarage();
+        });
+    });
+
+    // Export Buttons
+    document.getElementById("btn-export-save").addEventListener("click", exportSaveBinary);
+    document.getElementById("btn-export-xbox-zip").addEventListener("click", exportXboxZip);
+}
+
+// Update the entire UI from the save model
+function updateUI() {
+    // 1. Overview & Profile
+    inputProfileName.value = save.profileName;
+    inputCoins.value = save.coins;
+    selectCurrentLevel.value = String(save.currentLevel);
+    selectCurrentMission.value = String(save.currentMission);
+
+    inputYear.value = save.timestamp.year;
+    inputMonth.value = save.timestamp.month;
+    inputDay.value = save.timestamp.day;
+    inputTime.value = `${String(save.timestamp.hour).padStart(2, '0')}:${String(save.timestamp.minute).padStart(2, '0')}:${String(save.timestamp.second).padStart(2, '0')}`;
+
+    // 2. Audio Sliders
+    rangeSfx.value = save.sfxVolume;
+    valSfx.textContent = `${Math.round(save.sfxVolume * 100)}%`;
+    rangeMusic.value = save.musicVolume;
+    valMusic.textContent = `${Math.round(save.musicVolume * 100)}%`;
+    rangeDialog.value = save.dialogVolume;
+    valDialog.textContent = `${Math.round(save.dialogVolume * 100)}%`;
+
+    // 3. Sub-views
+    updateMetaPreview();
+    updateSidebarStats();
+    renderLevelPills();
+    renderLevelDetail(currentLevelView);
+    renderAllCardsTab();
+    renderGarage();
+    renderHexViewer(0);
+}
+
+function updateMetaPreview() {
+    const month = String(save.timestamp.month).padStart(2, '0');
+    const day = String(save.timestamp.day).padStart(2, '0');
+    const year = String(save.timestamp.year).slice(-2);
+    const hour = String(save.timestamp.hour).padStart(2, '0');
+    const min = String(save.timestamp.minute).padStart(2, '0');
+    const sec = String(save.timestamp.second).padStart(2, '0');
+
+    metaPreviewText.textContent = `Name = (L${save.currentLevel} M${save.currentMission})    ${month}/${day}/${year} ${hour}:${min}:${sec}`;
+}
+
+function updateSidebarStats() {
+    lblProfile.textContent = save.profileName;
+    lblCurrentProgress.textContent = `L${save.currentLevel} M${save.currentMission}`;
+    lblCoinsStat.textContent = save.coins.toLocaleString();
+
+    // Count cards
+    let totalCards = 0;
+    for (const lvl of save.levels) {
+        totalCards += lvl.cards.filter(Boolean).length;
+    }
+    lblCardsStat.textContent = `${totalCards} / 49`;
+    progCardsText.textContent = `${totalCards} / 49`;
+    progCardsBar.style.width = `${Math.round((totalCards / 49) * 100)}%`;
+
+    // Count missions
+    let totalMissions = 0;
+    for (const lvl of save.levels) {
+        for (const m of Object.values(lvl.missions)) {
+            if (m.completed) totalMissions++;
+        }
+    }
+    // 7 levels * (7 story + 1 bm) = 56 primary missions
+    progMissionsText.textContent = `${totalMissions} / 91`;
+    progMissionsBar.style.width = `${Math.round((totalMissions / 91) * 100)}%`;
+
+    // Count cars
+    const ownedCars = save.vehicles.filter(v => v.isOwned).length;
+    lblCarsStat.textContent = `${ownedCars} / 60`;
+    progCarsText.textContent = `${ownedCars} / 60`;
+    progCarsBar.style.width = `${Math.round((ownedCars / 60) * 100)}%`;
+
+    // Wasps
+    let totalWasps = 0;
+    for (const lvl of save.levels) {
+        totalWasps += lvl.waspsDestroyed || 0;
+    }
+    progWaspsText.textContent = `${totalWasps} / 140`;
+    progWaspsBar.style.width = `${Math.round((totalWasps / 140) * 100)}%`;
+}
+
+// Render Level Pills (1 to 7)
+function renderLevelPills() {
+    const container = document.getElementById("level-selector-pills");
+    if (!container) return;
+    container.innerHTML = "";
+
+    for (let i = 1; i <= 7; i++) {
+        const lvlData = SHAR_DATA.levels[i - 1];
+        const pill = document.createElement("button");
+        pill.className = `lvl-pill ${i === currentLevelView ? 'active' : ''}`;
+        pill.textContent = `Level ${i} (${lvlData.character})`;
+        pill.addEventListener("click", () => {
+            currentLevelView = i;
+            renderLevelPills();
+            renderLevelDetail(i);
+        });
+        container.appendChild(pill);
+    }
+}
+
+// Render Specific Level Detail
+function renderLevelDetail(lvlNum) {
+    const container = document.getElementById("level-detail-container");
+    if (!container) return;
+
+    const meta = SHAR_DATA.levels[lvlNum - 1];
+    const lvlState = save.levels[lvlNum - 1];
+
+    let cardsHtml = "";
+    meta.cards.forEach((card, idx) => {
+        const isCollected = lvlState.cards[idx];
+        cardsHtml += `
+            <div class="card-item ${isCollected ? 'collected' : ''}" data-lvl="${lvlNum}" data-card="${idx}">
+                <input type="checkbox" class="card-check" ${isCollected ? 'checked' : ''}>
+                <div>
+                    <div class="card-item-title">Card #${card.num}: ${card.name}</div>
+                    <div class="card-item-desc">${card.desc}</div>
+                </div>
+            </div>
+        `;
+    });
+
+    let missionsHtml = "";
+    meta.missions.forEach(m => {
+        const mState = lvlState.missions[m.id] || { completed: false, unlocked: false };
+        const isCompleted = mState.completed;
+        const badgeClass = m.type === "story" ? "badge-story" : (m.type === "race" ? "badge-race" : (m.type === "bonus" ? "badge-bonus" : "badge-gamble"));
+        
+        missionsHtml += `
+            <div class="mission-item">
+                <div class="mission-info">
+                    <input type="checkbox" class="mission-checkbox" data-lvl="${lvlNum}" data-mission="${m.id}" ${isCompleted ? 'checked' : ''}>
+                    <div>
+                        <div class="mission-name">${m.name}</div>
+                        <div class="mission-giver">Giver: ${m.giver} ${m.reward ? `• Reward: <strong>${m.reward}</strong>` : ''}</div>
+                    </div>
+                </div>
+                <span class="mission-badge ${badgeClass}">${m.type}</span>
+            </div>
+        `;
+    });
+
+    // Skins dropdown
+    let skinsOptions = "";
+    meta.skins.forEach(skin => {
+        skinsOptions += `<option value="${skin.id}" ${lvlState.activeSkin === skin.id ? 'selected' : ''}>${skin.name} (${skin.cost === 0 ? 'Default' : `$${skin.cost}`})</option>`;
+    });
+
+    container.innerHTML = `
+        <div class="level-banner">
+            <div>
+                <div class="level-title">${meta.name}</div>
+                <div class="level-meta-tags">
+                    <span class="tag">Character: ${meta.character}</span>
+                    <span class="tag">Time: ${meta.timeOfDay}</span>
+                    <span class="tag">Zone: ${meta.zone}</span>
+                    <span class="tag">Bonus Car: ${meta.bonusCar.name}</span>
+                </div>
+            </div>
+            <div>
+                <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-right: 8px;">Level Unlocked:</label>
+                <input type="checkbox" id="chk-level-unlocked" ${lvlState.isUnlocked ? 'checked' : ''} style="width: 18px; height: 18px; accent-color: var(--simpson-yellow); vertical-align: middle;">
+            </div>
+        </div>
+
+        <div class="grid-2col">
+            <!-- Missions List -->
+            <div class="card">
+                <div class="card-header flex-between">
+                    <span><span class="card-icon">🎯</span> Missions & Races (${meta.missions.length})</span>
+                    <button class="btn btn-sm btn-accent" id="btn-complete-this-level-missions">Complete All</button>
+                </div>
+                <div class="card-body">
+                    <div class="mission-list">
+                        ${missionsHtml}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Side Stats & Skins -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">👕</span> Character Outfit & Collectibles
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Active Character Skin / Costume</label>
+                            <select id="select-level-skin" class="form-control">
+                                ${skinsOptions}
+                            </select>
+                        </div>
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label>Gags Interacted (${meta.totalGags} Max)</label>
+                                <input type="number" id="input-level-gags" min="0" max="${meta.totalGags}" class="form-control" value="${lvlState.gagsFound}">
+                            </div>
+                            <div class="form-group">
+                                <label>Wasps Destroyed (${meta.totalWasps} Max)</label>
+                                <input type="number" id="input-level-wasps" min="0" max="${meta.totalWasps}" class="form-control" value="${lvlState.waspsDestroyed}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header flex-between">
+                        <span><span class="card-icon">🃏</span> Level Collector Cards (7)</span>
+                        <button class="btn btn-sm btn-warning" id="btn-collect-this-level-cards">Collect 7 Cards</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="cards-grid">
+                            ${cardsHtml}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Attach listeners for dynamic elements
+    container.querySelector("#chk-level-unlocked").addEventListener("change", (e) => {
+        lvlState.isUnlocked = e.target.checked;
+    });
+
+    container.querySelector("#select-level-skin").addEventListener("change", (e) => {
+        lvlState.activeSkin = e.target.value;
+    });
+
+    container.querySelector("#input-level-gags").addEventListener("input", (e) => {
+        lvlState.gagsFound = parseInt(e.target.value) || 0;
+    });
+
+    container.querySelector("#input-level-wasps").addEventListener("input", (e) => {
+        lvlState.waspsDestroyed = parseInt(e.target.value) || 0;
+        updateSidebarStats();
+    });
+
+    container.querySelector("#btn-complete-this-level-missions").addEventListener("click", () => {
+        for (const m of meta.missions) {
+            if (!lvlState.missions[m.id]) lvlState.missions[m.id] = {};
+            lvlState.missions[m.id].completed = true;
+            lvlState.missions[m.id].unlocked = true;
+        }
+        renderLevelDetail(lvlNum);
+        updateSidebarStats();
+        showToast(`🎯 All Level ${lvlNum} missions completed!`);
+    });
+
+    container.querySelector("#btn-collect-this-level-cards").addEventListener("click", () => {
+        for (let i = 0; i < 7; i++) {
+            lvlState.cards[i] = true;
+            lvlState.cardNames[i] = "Cardx";
+        }
+        renderLevelDetail(lvlNum);
+        updateSidebarStats();
+        showToast(`🃏 Collected all 7 cards for Level ${lvlNum}!`);
+    });
+
+    // Individual mission check
+    container.querySelectorAll(".mission-checkbox").forEach(chk => {
+        chk.addEventListener("change", (e) => {
+            const mId = e.target.getAttribute("data-mission");
+            if (!lvlState.missions[mId]) lvlState.missions[mId] = {};
+            lvlState.missions[mId].completed = e.target.checked;
+            lvlState.missions[mId].unlocked = true;
+            updateSidebarStats();
+        });
+    });
+
+    // Individual card click
+    container.querySelectorAll(".card-item").forEach(cEl => {
+        cEl.addEventListener("click", (e) => {
+            const cIdx = parseInt(cEl.getAttribute("data-card"));
+            const chk = cEl.querySelector(".card-check");
+            // toggle
+            if (e.target !== chk) {
+                chk.checked = !chk.checked;
+            }
+            lvlState.cards[cIdx] = chk.checked;
+            lvlState.cardNames[cIdx] = chk.checked ? "Cardx" : "NULL";
+            cEl.classList.toggle("collected", chk.checked);
+            updateSidebarStats();
+        });
+    });
+}
+
+// Render All Cards Tab
+function renderAllCardsTab() {
+    const container = document.getElementById("all-cards-container");
+    if (!container) return;
+
+    let html = "";
+    SHAR_DATA.levels.forEach(lvl => {
+        const lvlState = save.levels[lvl.id - 1];
+        let itemsHtml = "";
+        lvl.cards.forEach((card, idx) => {
+            const isCollected = lvlState.cards[idx];
+            itemsHtml += `
+                <div class="card-item ${isCollected ? 'collected' : ''}" data-lvl="${lvl.id}" data-card="${idx}">
+                    <input type="checkbox" class="card-check" ${isCollected ? 'checked' : ''}>
+                    <div>
+                        <div class="card-item-title">Card #${card.num}: ${card.name}</div>
+                        <div class="card-item-desc">${card.desc}</div>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `
+            <div class="card mb-20" style="margin-bottom: 20px;">
+                <div class="card-header flex-between">
+                    <span><span class="card-icon">🃏</span> ${lvl.name} (Bonus Car: <strong>${lvl.bonusCar.name}</strong>)</span>
+                    <button class="btn btn-sm btn-accent btn-collect-level-cards-all" data-lvl="${lvl.id}">Collect 7 Cards</button>
+                </div>
+                <div class="card-body">
+                    <div class="cards-grid">
+                        ${itemsHtml}
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+
+    // Attach click listeners for all cards
+    container.querySelectorAll(".card-item").forEach(cEl => {
+        cEl.addEventListener("click", (e) => {
+            const lvlId = parseInt(cEl.getAttribute("data-lvl"));
+            const cIdx = parseInt(cEl.getAttribute("data-card"));
+            const chk = cEl.querySelector(".card-check");
+            if (e.target !== chk) {
+                chk.checked = !chk.checked;
+            }
+            save.levels[lvlId - 1].cards[cIdx] = chk.checked;
+            save.levels[lvlId - 1].cardNames[cIdx] = chk.checked ? "Cardx" : "NULL";
+            cEl.classList.toggle("collected", chk.checked);
+            updateSidebarStats();
+        });
+    });
+
+    container.querySelectorAll(".btn-collect-level-cards-all").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const lvlId = parseInt(btn.getAttribute("data-lvl"));
+            for (let i = 0; i < 7; i++) {
+                save.levels[lvlId - 1].cards[i] = true;
+                save.levels[lvlId - 1].cardNames[i] = "Cardx";
+            }
+            renderAllCardsTab();
+            updateSidebarStats();
+            showToast(`✨ Collected all 7 cards for Level ${lvlId}!`);
+        });
+    });
+}
+
+// Render Vehicle Garage Tab (60 Slots)
+function renderGarage() {
+    const container = document.getElementById("garage-grid");
+    if (!container) return;
+
+    let html = "";
+    SHAR_DATA.allVehicles.forEach((carMeta, idx) => {
+        // Find if in save
+        const saveVehicle = save.vehicles.find(v => v.id === carMeta.id);
+        const isOwned = saveVehicle ? saveVehicle.isOwned : false;
+        const health = saveVehicle ? saveVehicle.health : 1.0;
+
+        // Apply filter
+        if (currentGarageFilter === "owned" && !isOwned) return;
+        if (currentGarageFilter === "level1" && carMeta.level !== 1) return;
+        if (currentGarageFilter === "level2" && carMeta.level !== 2) return;
+        if (currentGarageFilter === "level3" && carMeta.level !== 3) return;
+        if (currentGarageFilter === "level4" && carMeta.level !== 4) return;
+        if (currentGarageFilter === "level5" && carMeta.level !== 5) return;
+        if (currentGarageFilter === "level6" && carMeta.level !== 6) return;
+        if (currentGarageFilter === "level7" && carMeta.level !== 7) return;
+        if (currentGarageFilter === "bonus" && carMeta.level !== 0) return;
+
+        html += `
+            <div class="vehicle-card ${isOwned ? 'owned' : ''}">
+                <div class="vehicle-card-header">
+                    <div>
+                        <div class="vehicle-name">${carMeta.name}</div>
+                        <div class="vehicle-type">${carMeta.type} • <code>${carMeta.id}</code></div>
+                    </div>
+                    <span class="vehicle-owned-tag ${isOwned ? 'owned-yes' : 'owned-no'}">${isOwned ? 'In Garage' : 'Locked'}</span>
+                </div>
+
+                <div class="car-stats">
+                    <div class="stat-row">
+                        <span class="stat-name">Speed</span>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${(carMeta.speed / 5) * 100}%;"></div></div>
+                        <span>${carMeta.speed}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-name">Accel</span>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${(carMeta.accel / 5) * 100}%;"></div></div>
+                        <span>${carMeta.accel}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-name">Toughness</span>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${(carMeta.tough / 5) * 100}%;"></div></div>
+                        <span>${carMeta.tough}</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-name">Handling</span>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${(carMeta.hand / 5) * 100}%;"></div></div>
+                        <span>${carMeta.hand}</span>
+                    </div>
+                </div>
+
+                <div class="vehicle-actions">
+                    <button class="btn btn-sm ${isOwned ? 'btn-secondary' : 'btn-success'} w-100 btn-toggle-vehicle" data-id="${carMeta.id}">
+                        ${isOwned ? '❌ Remove' : '➕ Add to Garage'}
+                    </button>
+                    ${isOwned ? `
+                        <button class="btn btn-sm btn-accent btn-repair-vehicle" data-id="${carMeta.id}" title="Set Health to 100%">
+                            🔧 100%
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+
+    // Attach listeners
+    container.querySelectorAll(".btn-toggle-vehicle").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const carId = btn.getAttribute("data-id");
+            let v = save.vehicles.find(item => item.id === carId);
+            if (v) {
+                v.isOwned = !v.isOwned;
+                if (!v.isOwned) v.id = "n/a";
+            } else {
+                // Find first free slot
+                const freeSlot = save.vehicles.find(item => !item.isOwned || item.id === "n/a");
+                if (freeSlot) {
+                    freeSlot.id = carId;
+                    freeSlot.isOwned = true;
+                    freeSlot.health = 1.0;
+                    freeSlot.damage = -1.0;
+                }
+            }
+            renderGarage();
+            updateSidebarStats();
+        });
+    });
+
+    container.querySelectorAll(".btn-repair-vehicle").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const carId = btn.getAttribute("data-id");
+            let v = save.vehicles.find(item => item.id === carId);
+            if (v) {
+                v.health = 1.0;
+                v.damage = -1.0;
+                showToast(`🔧 Repaired ${carId} to 100%!`);
+            }
+        });
+    });
+}
+
+// Render Hex Viewer
+function renderHexViewer(startOffset = 0) {
+    const dumpEl = document.getElementById("hex-dump-content");
+    if (!dumpEl || !save.bytes) return;
+
+    const data = save.serialize();
+    let text = `Offset(h)  -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- --  Decoded Text\n`;
+    text += `--------  -----------------------  -----------------------  ----------------\n`;
+
+    const viewLength = Math.min(1024, data.length - startOffset);
+    for (let i = startOffset; i < startOffset + viewLength; i += 16) {
+        const offsetHex = i.toString(16).padStart(8, '0');
+        let hexPart1 = "";
+        let hexPart2 = "";
+        let asciiPart = "";
+
+        for (let j = 0; j < 16; j++) {
+            const byteIdx = i + j;
+            if (byteIdx < data.length) {
+                const b = data[byteIdx];
+                const bHex = b.toString(16).padStart(2, '0');
+                if (j < 8) hexPart1 += bHex + " ";
+                else hexPart2 += bHex + " ";
+                asciiPart += (b >= 32 && b < 127) ? String.fromCharCode(b) : ".";
+            } else {
+                if (j < 8) hexPart1 += "   ";
+                else hexPart2 += "   ";
+            }
+        }
+        text += `${offsetHex}  ${hexPart1} ${hexPart2} |${asciiPart}|\n`;
+    }
+
+    dumpEl.textContent = text;
+
+    // Hex buttons jump
+    document.querySelectorAll(".hex-jump-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".hex-jump-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            const off = parseInt(btn.getAttribute("data-offset")) || 0;
+            renderHexViewer(off);
+        });
+    });
+}
+
+// Export Save Binary (05)
+function exportSaveBinary() {
+    try {
+        const modifiedBytes = save.serialize();
+        const blob = new Blob([modifiedBytes], { type: "application/octet-stream" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = save.filename || "05";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast("💾 Save binary (05) exported successfully!");
+    } catch (e) {
+        console.error(e);
+        showToast("Export failed: " + e.message, true);
+    }
+}
+
+// Export Full Xbox ZIP Package
+async function exportXboxZip() {
+    if (typeof JSZip === "undefined") {
+        showToast("JSZip library not available, downloading single file.", true);
+        exportSaveBinary();
+        return;
+    }
+
+    try {
+        const zip = new JSZip();
+        const modifiedBytes = save.serialize();
+        const metaBytes = save.generateSaveMeta();
+
+        // Create Xbox save folder structure:
+        // 56550015/85DEBA48DF78/05
+        // 56550015/85DEBA48DF78/SaveMeta.xbx
+        const saveFolder = zip.folder("56550015").folder("85DEBA48DF78");
+        saveFolder.file("05", modifiedBytes);
+        saveFolder.file("SaveMeta.xbx", metaBytes);
+
+        const content = await zip.generateAsync({ type: "blob" });
+        const url = URL.createObjectURL(content);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `SHAR_Xbox_Save_L${save.currentLevel}M${save.currentMission}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showToast("📦 Full Xbox Save ZIP package exported successfully!");
+    } catch (e) {
+        console.error(e);
+        showToast("ZIP export failed: " + e.message, true);
+    }
+}
+
+    </script>
+</body>
+</html>
