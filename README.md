@@ -4,6 +4,34 @@ A web-based save game editor for **The Simpsons: Hit & Run** (Original Xbox & PC
 
 ![Simpsons Hit & Run](https://upload.wikimedia.org/wikipedia/en/2/2a/The_Simpsons_-_Hit_%26_Run_Coverart.png)
 
+## Important: Xbox saves are signed
+
+The last 20 bytes of an Xbox save data file are an **HMAC-SHA1 over everything
+before them**. Change any value and that signature stops matching, and the game
+reports a **damaged save** no matter how correct the edit is.
+
+The key is specific to **your console and to this game**. It cannot be derived
+from the save file or from the game disc, so the editor cannot work it out on
+its own: paste it into the **Console signing key** box at the top of the page.
+It is remembered in your browser afterwards.
+
+Without a key the editor still works, but it will tell you on export that the
+save is unsigned, and the game will reject it.
+
+### Recovering the key
+
+The key exists in the Xbox's memory while the game is running. With xemu, which
+is QEMU underneath:
+
+```
+xemu.exe -monitor tcp:127.0.0.1:4444,server,nowait
+```
+
+Boot the game, dump the guest's RAM through the monitor (`pmemsave 0 0x4000000
+ram.bin`), then search that dump for the 16-byte key that reproduces the
+signature on a save the console itself wrote. A match is proof, since it
+regenerates a signature the console produced.
+
 ## Features
 
 - **Save File Support**:

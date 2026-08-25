@@ -1085,6 +1085,18 @@ body {
                     </button>
                 </div>
             </div>
+
+            <!-- Console signing key -->
+            <div class="signing-bar">
+                <label for="inp-save-key" class="signing-label">
+                    Console signing key
+                    <span class="signing-help" title="The last 20 bytes of an Xbox save are an HMAC-SHA1 over the rest, keyed per console and per game. Without it the game reports a damaged save.">?</span>
+                </label>
+                <input type="text" id="inp-save-key" class="signing-input"
+                       placeholder="32 hex characters for this console and game"
+                       spellcheck="false" autocomplete="off" maxlength="47">
+                <span id="signing-status" class="signing-status signing-status-missing">no key &mdash; exports will be rejected by the game</span>
+            </div>
         </header>
 
         <!-- Notification Toast -->
@@ -1977,6 +1989,32 @@ const SHAR_DATA = {
 };
 
     </script>
+    <style>
+    .signing-bar {
+        display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+        margin-top: 14px; padding: 10px 14px;
+        background: rgba(0, 0, 0, 0.22);
+        border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 8px;
+    }
+    .signing-label { font-size: 0.82rem; font-weight: 700; letter-spacing: .02em; opacity: .9; }
+    .signing-help {
+        display: inline-block; width: 15px; height: 15px; line-height: 15px;
+        text-align: center; border-radius: 50%; font-size: 0.7rem; cursor: help;
+        background: rgba(255, 255, 255, 0.18);
+    }
+    .signing-input {
+        flex: 1 1 340px; min-width: 240px; padding: 7px 10px;
+        font-family: ui-monospace, Consolas, monospace; font-size: 0.82rem;
+        color: inherit; background: rgba(0, 0, 0, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 6px;
+    }
+    .signing-input:focus { outline: none; border-color: #48cae4; }
+    .signing-status { font-size: 0.76rem; font-weight: 600; }
+    .signing-status-ok { color: #4ade80; }
+    .signing-status-missing { color: #fbbf24; }
+    .signing-status-bad { color: #f87171; }
+    </style>
+    <script src="xbox_signing.js"></script>
     <script>
 // The Simpsons: Hit & Run - Save Game Binary Parser & Serializer
 // Supports Original Xbox binary saves ("05") and PC saves
@@ -2096,7 +2134,8 @@ class SharSaveGame {
             for (let m = 0; m < 13; m++) {
                 const mOff = base + 120 + m * 32;
                 const mName = this.readString(mOff, 16) || missionKeys[m];
-                const isCompleted = dv.getInt32(mOff + 16, true) === 1;
+                // 16-bit: the two bytes after it are separate per-mission data.
+                const isCompleted = dv.getUint16(mOff + 16, true) === 1;
                 const unlockState = dv.getInt32(mOff + 20, true); // 2 = unlocked/available, 0 = locked
                 const bestTime = dv.getInt32(mOff + 24, true);
                 const secondaryStat = dv.getInt32(mOff + 28, true);
@@ -2186,11 +2225,22 @@ class SharSaveGame {
     writeString(offset, str, maxLength) {
         for (let i = 0; i < maxLength; i++) {
             if (i < str.length) {
-                this.bytes[offset + i] = str.charCodeAt(i);
+                this.bytes[offset + i] = str.charCodeAt(i) & 0xFF;
             } else {
                 this.bytes[offset + i] = 0;
             }
         }
+    }
+
+    // Writes the text and a single terminator, leaving whatever follows alone.
+    // Several of these fields are followed by live data that zero-padding the
+    // full width would destroy.
+    writeStringPreserve(offset, str, maxLength) {
+        const limit = Math.min(str.length, maxLength - 1);
+        for (let i = 0; i < limit; i++) {
+            this.bytes[offset + i] = str.charCodeAt(i) & 0xFF;
+        }
+        this.bytes[offset + limit] = 0;
     }
 
     // Save and serialize changes back into the buffer
@@ -2210,7 +2260,7 @@ class SharSaveGame {
         u8[0x0F] = this.currentMission;
 
         // Profile name
-        this.writeString(0x15, this.profileName, 16);
+        this.writeStringPreserve(0x15, this.profileName, 16);
 
         // 2. Update Levels 1 to 7
         for (let lvlIdx = 0; lvlIdx < 7; lvlIdx++) {
@@ -2223,7 +2273,7 @@ class SharSaveGame {
                 const isCollected = lvlObj.cards[c];
                 // In game, collected card string is e.g. "Cardx" or card name, flag = 1
                 const cName = isCollected ? (lvlObj.cardNames[c] === "NULL" ? "Cardx" : lvlObj.cardNames[c]) : "NULL";
-                this.writeString(cOff, cName, 16);
+                this.writeStringPreserve(cOff, cName, 16);
                 u8[cOff + 16] = isCollected ? 1 : 0;
             }
 
@@ -2234,8 +2284,10 @@ class SharSaveGame {
                 const k = missionKeys[m];
                 const mData = lvlObj.missions[k] || { completed: false, unlocked: false, bestTime: 0, secondaryStat: -1 };
                 
-                this.writeString(mOff, k, 16);
-                dv.setInt32(mOff + 16, mData.completed ? 1 : 0, true);
+                // Mission names are left as the game wrote them: completion
+                // lives in the numbers below, and not every level fills all 13
+                // name slots with text.
+                dv.setUint16(mOff + 16, mData.completed ? 1 : 0, true);
                 dv.setInt32(mOff + 20, mData.completed ? 2 : (mData.unlocked ? 2 : 0), true);
                 dv.setInt32(mOff + 24, mData.bestTime || 0, true);
                 dv.setInt32(mOff + 28, mData.secondaryStat ?? -1, true);
@@ -2244,10 +2296,21 @@ class SharSaveGame {
             // Trailing 84 bytes in level
             const extraBase = base + 536;
             dv.setInt32(extraBase + 12, lvlObj.isUnlocked ? 1 : 0, true);
-            this.writeString(extraBase + 16, lvlObj.activeSkin || "NULL", 16);
+            this.writeStringPreserve(extraBase + 16, lvlObj.activeSkin || "NULL", 16);
 
-            // Wasps & Gags
+            // Wasps & Gags. Gags are a bitmask but the UI counts them, so the
+            // mask is only rewritten when the count actually changed.
             dv.setUint32(extraBase + 36, lvlObj.waspsDestroyed || 0, true);
+
+            const wantedGags = lvlObj.gagsFound || 0;
+            const currentMask = lvlObj.rawGagMask || 0;
+            if (this.countBits(currentMask) !== wantedGags) {
+                const mask = wantedGags >= 32
+                    ? 0xFFFFFFFF
+                    : ((wantedGags <= 0) ? 0 : (((1 << wantedGags) >>> 0) - 1));
+                dv.setUint32(extraBase + 32, mask >>> 0, true);
+                lvlObj.rawGagMask = mask >>> 0;
+            }
         }
 
         // 3. Update Global State
@@ -2260,11 +2323,11 @@ class SharSaveGame {
             const vOff = 0x1131 + v * 24;
             const vData = this.vehicles[v];
             if (vData && vData.isOwned && vData.id && vData.id !== "n/a" && vData.id !== "NULL") {
-                this.writeString(vOff, vData.id, 16);
+                this.writeStringPreserve(vOff, vData.id, 16);
                 dv.setFloat32(vOff + 16, vData.health ?? 1.0, true);
                 dv.setFloat32(vOff + 20, vData.damage ?? -1.0, true);
             } else {
-                this.writeString(vOff, "n/a", 16);
+                this.writeStringPreserve(vOff, "n/a", 16);
                 dv.setFloat32(vOff + 16, -1.0, true);
                 dv.setFloat32(vOff + 20, -1.0, true);
             }
@@ -2275,6 +2338,14 @@ class SharSaveGame {
             dv.setFloat32(0x1BF9, this.sfxVolume, true);
             dv.setFloat32(0x1BFD, this.musicVolume, true);
             dv.setFloat32(0x1C01, this.dialogVolume, true);
+        }
+
+        // Re-sign. Every change above alters the data the trailing 20-byte
+        // HMAC-SHA1 covers, and without a matching signature the game reports
+        // the save as damaged however correct the edits are.
+        this.lastSignResult = null;
+        if (typeof XboxSigning !== "undefined") {
+            this.lastSignResult = XboxSigning.signBuffer(this.bytes);
         }
 
         return this.bytes;
@@ -2691,6 +2762,36 @@ function setupEventListeners() {
     });
 
     // Export Buttons
+    // --- console signing key -------------------------------------------
+    const keyInput = document.getElementById("inp-save-key");
+    const keyStatus = document.getElementById("signing-status");
+
+    function refreshKeyStatus() {
+        const key = XboxSigning.parseKey(keyInput.value);
+        const typed = keyInput.value.replace(/[^0-9a-fA-F]/g, "");
+        keyStatus.classList.remove("signing-status-ok", "signing-status-missing",
+                                   "signing-status-bad");
+        if (key) {
+            keyStatus.textContent = "key set — exports will be signed";
+            keyStatus.classList.add("signing-status-ok");
+        } else if (typed.length === 0) {
+            keyStatus.innerHTML = "no key &mdash; exports will be rejected by the game";
+            keyStatus.classList.add("signing-status-missing");
+        } else {
+            keyStatus.textContent = `need 32 hex characters (${typed.length} so far)`;
+            keyStatus.classList.add("signing-status-bad");
+        }
+    }
+
+    const storedKey = localStorage.getItem(XboxSigning.STORAGE_KEY);
+    if (storedKey) { keyInput.value = storedKey; }
+    refreshKeyStatus();
+
+    keyInput.addEventListener("input", () => {
+        XboxSigning.storeKey(keyInput.value);
+        refreshKeyStatus();
+    });
+
     document.getElementById("btn-export-save").addEventListener("click", exportSaveBinary);
     document.getElementById("btn-export-xbox-zip").addEventListener("click", exportXboxZip);
 }
@@ -3207,6 +3308,16 @@ function renderHexViewer(startOffset = 0) {
 }
 
 // Export Save Binary (05)
+// Shared by both export paths: say plainly when a save went out unsigned.
+function warnIfUnsigned() {
+    if (save && save.lastSignResult === false) {
+        showToast("Exported without a signature - add your console key or the " +
+                  "game will report a damaged save.", true);
+        return false;
+    }
+    return true;
+}
+
 function exportSaveBinary() {
     try {
         const modifiedBytes = save.serialize();
@@ -3219,7 +3330,9 @@ function exportSaveBinary() {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        showToast("💾 Save binary (05) exported successfully!");
+        if (warnIfUnsigned()) {
+            showToast("💾 Save binary (05) exported successfully!");
+        }
     } catch (e) {
         console.error(e);
         showToast("Export failed: " + e.message, true);
@@ -3256,7 +3369,9 @@ async function exportXboxZip() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        showToast("📦 Full Xbox Save ZIP package exported successfully!");
+        if (warnIfUnsigned()) {
+            showToast("📦 Full Xbox Save ZIP package exported successfully!");
+        }
     } catch (e) {
         console.error(e);
         showToast("ZIP export failed: " + e.message, true);

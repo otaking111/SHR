@@ -1,12 +1,11 @@
-# Large Game Binaries & ISOs
-*.iso
-*.ISO
-*.xbe
-*.rcf
+# The console signing key is personal and machine specific. Never commit it.
+save_key.txt
+recovered_keys.txt
+eeprom.bin
+ram*.bin
 
-# Python cache & temporary files
-__pycache__/
-*.pyc
-
-# Local scratch logs
-*.log
+# Local save data
+*.qcow2
+node_modules/
+.DS_Store
+Thumbs.db

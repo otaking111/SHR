@@ -116,7 +116,10 @@ class SharSaveGame {
             for (let m = 0; m < 13; m++) {
                 const mOff = base + 120 + m * 32;
                 const mName = this.readString(mOff, 16) || missionKeys[m];
-                const isCompleted = dv.getInt32(mOff + 16, true) === 1;
+                // Completion is a 16-bit flag. The two bytes after it hold
+                // separate per-mission data, so reading this as an int32 and
+                // writing it back destroyed them.
+                const isCompleted = dv.getUint16(mOff + 16, true) === 1;
                 const unlockState = dv.getInt32(mOff + 20, true); // 2 = unlocked/available, 0 = locked
                 const bestTime = dv.getInt32(mOff + 24, true);
                 const secondaryStat = dv.getInt32(mOff + 28, true);
@@ -206,11 +209,25 @@ class SharSaveGame {
     writeString(offset, str, maxLength) {
         for (let i = 0; i < maxLength; i++) {
             if (i < str.length) {
-                this.bytes[offset + i] = str.charCodeAt(i);
+                this.bytes[offset + i] = str.charCodeAt(i) & 0xFF;
             } else {
                 this.bytes[offset + i] = 0;
             }
         }
+    }
+
+    // Same, but only writes the text and a single terminator. Anything after
+    // that is left alone.
+    //
+    // The profile name field is followed by eight bytes that are not part of
+    // the name and are not always zero. Padding the whole 16-byte field, as
+    // writeString does, destroyed them on every export.
+    writeStringPreserve(offset, str, maxLength) {
+        const limit = Math.min(str.length, maxLength - 1);
+        for (let i = 0; i < limit; i++) {
+            this.bytes[offset + i] = str.charCodeAt(i) & 0xFF;
+        }
+        this.bytes[offset + limit] = 0;
     }
 
     // Save and serialize changes back into the buffer
@@ -229,8 +246,8 @@ class SharSaveGame {
         u8[0x0E] = this.currentLevel;
         u8[0x0F] = this.currentMission;
 
-        // Profile name
-        this.writeString(0x15, this.profileName, 16);
+        // Profile name. Preserving, so the bytes after the terminator survive.
+        this.writeStringPreserve(0x15, this.profileName, 16);
 
         // 2. Update Levels 1 to 7
         for (let lvlIdx = 0; lvlIdx < 7; lvlIdx++) {
@@ -243,7 +260,7 @@ class SharSaveGame {
                 const isCollected = lvlObj.cards[c];
                 // In game, collected card string is e.g. "Cardx" or card name, flag = 1
                 const cName = isCollected ? (lvlObj.cardNames[c] === "NULL" ? "Cardx" : lvlObj.cardNames[c]) : "NULL";
-                this.writeString(cOff, cName, 16);
+                this.writeStringPreserve(cOff, cName, 16);
                 u8[cOff + 16] = isCollected ? 1 : 0;
             }
 
@@ -254,8 +271,11 @@ class SharSaveGame {
                 const k = missionKeys[m];
                 const mData = lvlObj.missions[k] || { completed: false, unlocked: false, bestTime: 0, secondaryStat: -1 };
                 
-                this.writeString(mOff, k, 16);
-                dv.setInt32(mOff + 16, mData.completed ? 1 : 0, true);
+                // Mission names are left exactly as the game wrote them.
+                // Completion lives in the numeric fields below, and not every
+                // level fills all 13 name slots with text - some hold binary
+                // data - so rewriting them only risked corruption.
+                dv.setUint16(mOff + 16, mData.completed ? 1 : 0, true);
                 dv.setInt32(mOff + 20, mData.completed ? 2 : (mData.unlocked ? 2 : 0), true);
                 dv.setInt32(mOff + 24, mData.bestTime || 0, true);
                 dv.setInt32(mOff + 28, mData.secondaryStat ?? -1, true);
@@ -264,10 +284,24 @@ class SharSaveGame {
             // Trailing 84 bytes in level
             const extraBase = base + 536;
             dv.setInt32(extraBase + 12, lvlObj.isUnlocked ? 1 : 0, true);
-            this.writeString(extraBase + 16, lvlObj.activeSkin || "NULL", 16);
+            this.writeStringPreserve(extraBase + 16, lvlObj.activeSkin || "NULL", 16);
 
-            // Wasps & Gags
+            // Wasps & Gags.
+            //
+            // Gags are stored as a bitmask; the UI works in counts. Only
+            // rewrite the mask when the count actually changed, so an untouched
+            // save keeps the exact bits the game wrote.
             dv.setUint32(extraBase + 36, lvlObj.waspsDestroyed || 0, true);
+
+            const wantedGags = lvlObj.gagsFound || 0;
+            const currentMask = lvlObj.rawGagMask || 0;
+            if (this.countBits(currentMask) !== wantedGags) {
+                const mask = wantedGags >= 32
+                    ? 0xFFFFFFFF
+                    : ((wantedGags <= 0) ? 0 : (((1 << wantedGags) >>> 0) - 1));
+                dv.setUint32(extraBase + 32, mask >>> 0, true);
+                lvlObj.rawGagMask = mask >>> 0;
+            }
         }
 
         // 3. Update Global State
@@ -280,11 +314,11 @@ class SharSaveGame {
             const vOff = 0x1131 + v * 24;
             const vData = this.vehicles[v];
             if (vData && vData.isOwned && vData.id && vData.id !== "n/a" && vData.id !== "NULL") {
-                this.writeString(vOff, vData.id, 16);
+                this.writeStringPreserve(vOff, vData.id, 16);
                 dv.setFloat32(vOff + 16, vData.health ?? 1.0, true);
                 dv.setFloat32(vOff + 20, vData.damage ?? -1.0, true);
             } else {
-                this.writeString(vOff, "n/a", 16);
+                this.writeStringPreserve(vOff, "n/a", 16);
                 dv.setFloat32(vOff + 16, -1.0, true);
                 dv.setFloat32(vOff + 20, -1.0, true);
             }
@@ -295,6 +329,14 @@ class SharSaveGame {
             dv.setFloat32(0x1BF9, this.sfxVolume, true);
             dv.setFloat32(0x1BFD, this.musicVolume, true);
             dv.setFloat32(0x1C01, this.dialogVolume, true);
+        }
+
+        // Finally: re-sign. Everything above changes the data the trailing
+        // 20-byte HMAC-SHA1 covers, so without this the game rejects the save
+        // as damaged no matter how correct the edits are.
+        this.lastSignResult = null;
+        if (typeof XboxSigning !== "undefined") {
+            this.lastSignResult = XboxSigning.signBuffer(this.bytes);
         }
 
         return this.bytes;
