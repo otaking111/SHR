@@ -112,10 +112,18 @@ const XboxSigning = (function () {
 
     function getStoredKey() {
         try {
-            return parseKey(localStorage.getItem(STORAGE_KEY) || "");
+            const stored = parseKey(localStorage.getItem(STORAGE_KEY) || "");
+            if (stored) {
+                return stored;
+            }
         } catch (e) {
-            return null;
+            // Storage can be blocked on file:// or in private windows; fall
+            // through to the local override so signing still works.
         }
+        if (typeof window !== "undefined" && window.LOCAL_SAVE_KEY) {
+            return parseKey(window.LOCAL_SAVE_KEY);
+        }
+        return null;
     }
 
     function storeKey(text) {

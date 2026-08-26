@@ -2015,6 +2015,9 @@ const SHAR_DATA = {
     .signing-status-bad { color: #f87171; }
     </style>
     <script src="xbox_signing.js"></script>
+    <!-- Optional, git-ignored: create local_key.js next to this file with
+         window.LOCAL_SAVE_KEY = "<32 hex chars>"; to pre-fill your key. -->
+    <script src="local_key.js" onerror="void 0"></script>
     <script>
 // The Simpsons: Hit & Run - Save Game Binary Parser & Serializer
 // Supports Original Xbox binary saves ("05") and PC saves
@@ -2783,8 +2786,13 @@ function setupEventListeners() {
         }
     }
 
-    const storedKey = localStorage.getItem(XboxSigning.STORAGE_KEY);
-    if (storedKey) { keyInput.value = storedKey; }
+    // A local_key.js override wins, then whatever the browser remembered.
+    const localKey = (typeof window !== "undefined" && window.LOCAL_SAVE_KEY) || null;
+    const storedKey = localKey || localStorage.getItem(XboxSigning.STORAGE_KEY);
+    if (storedKey) {
+        keyInput.value = storedKey;
+        XboxSigning.storeKey(storedKey);
+    }
     refreshKeyStatus();
 
     keyInput.addEventListener("input", () => {

@@ -18,6 +18,19 @@ It is remembered in your browser afterwards.
 Without a key the editor still works, but it will tell you on export that the
 save is unsigned, and the game will reject it.
 
+### Pre-filling the key
+
+To avoid pasting it every time, create a file called `local_key.js` next to
+`index.html`:
+
+```js
+window.LOCAL_SAVE_KEY = "0123456789abcdef0123456789abcdef";
+```
+
+The page picks it up automatically. `local_key.js` is git-ignored, so a
+personal key never reaches the repository, and the file is optional: without it
+the page simply falls back to the key box and whatever the browser remembered.
+
 ### Recovering the key
 
 The key exists in the Xbox's memory while the game is running. With xemu, which
